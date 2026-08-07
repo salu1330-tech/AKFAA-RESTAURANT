@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        AKFAA Order Dashboard
+    </title>
+
+    <style>
+
+        body {
+
+            font-family: Arial;
+
+            background: #10251b;
+
+            color: white;
+
+            padding: 20px;
+
+        }
+
+
+        h1 {
+
+            color: #d4af37;
+
+        }
+
+
+        .orders {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(300px, 1fr)
+                );
+
+            gap: 20px;
+
+        }
+
+
+        .order {
+
+            background: #1c3829;
+
+            border-radius: 15px;
+
+            padding: 20px;
+
+            border-left:
+                6px solid #d4af37;
+
+        }
+
+
+        .new {
+
+            border-left-color: red;
+
+        }
+
+
+        .preparing {
+
+            border-left-color: orange;
+
+        }
+
+
+        .ready {
+
+            border-left-color: green;
+
+        }
+
+
+        button {
+
+            border: none;
+
+            padding: 10px;
+
+            margin: 5px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+        }
+
+
+        .preparing-btn {
+
+            background: orange;
+
+        }
+
+
+        .ready-btn {
+
+            background: green;
+
+            color: white;
+
+        }
+
+
+        .complete-btn {
+
+            background: #3498db;
+
+            color: white;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<h1>
+    ☕ AKFAA ORDER DASHBOARD
+</h1>
+
+<p>
+    Kitchen & Restaurant Orders
+</p>
+
+
+<div class="orders">
+
+
+{% for entry in orders_data %}
+
+<div class="order {{ entry.order.status|lower }}">
+
+
+    <h2>
+
+        Order #{{ entry.order.id }}
+
+    </h2>
+
+
+    <h3>
+
+        🪑 Table
+        {{ entry.order.table_no }}
+
+    </h3>
+
+
+    <p>
+
+        <b>Customer:</b>
+
+        {{ entry.order.customer_name }}
+
+    </p>
+
+
+    <p>
+
+        <b>Phone:</b>
+
+        {{ entry.order.phone }}
+
+    </p>
+
+
+    <p>
+
+        <b>Status:</b>
+
+        {{ entry.order.status }}
+
+    </p>
+
+
+    <hr>
+
+
+    <h3>
+        Items
+    </h3>
+
+
+    <ul>
+
+    {% for item in entry.items %}
+
+        <li>
+
+            {{ item.item_name }}
+
+            × {{ item.quantity }}
+
+            —
+
+            OMR
+
+            {{ "%.3f"|format(
+                item.price *
+                item.quantity
+            ) }}
+
+        </li>
+
+    {% endfor %}
+
+    </ul>
+
+
+    <h2>
+
+        Total:
+
+        OMR
+
+        {{ "%.3f"|format(
+            entry.order.total
+        ) }}
+
+    </h2>
+
+
+    {% if entry.order.instructions %}
+
+        <p>
+
+            📝
+
+            <b>Note:</b>
+
+            {{ entry.order.instructions }}
+
+        </p>
+
+    {% endif %}
+
+
+    <form
+        action="{{ url_for(
+            'update_status',
+            order_id=entry.order.id,
+            status='PREPARING'
+        ) }}"
+        method="POST">
+
+        <button
+            class="preparing-btn">
+
+            👨‍🍳 Preparing
+
+        </button>
+
+    </form>
+
+
+    <form
+        action="{{ url_for(
+            'update_status',
+            order_id=entry.order.id,
+            status='READY'
+        ) }}"
+        method="POST">
+
+        <button
+            class="ready-btn">
+
+            ✅ Ready
+
+        </button>
+
+    </form>
+
+
+    <form
+        action="{{ url_for(
+            'update_status',
+            order_id=entry.order.id,
+            status='COMPLETED'
+        ) }}"
+        method="POST">
+
+        <button
+            class="complete-btn">
+
+            ✔ Completed
+
+        </button>
+
+    </form>
+
+
+</div>
+
+{% endfor %}
+
+
+</div>
+
+
+</body>
+
+</html>
