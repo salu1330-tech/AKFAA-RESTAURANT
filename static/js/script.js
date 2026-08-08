@@ -1,6 +1,7 @@
 // ============================================
-// AKFAA RESTAURANT - CORRECTED MENU DATA
+// AKFAA COFFEE SHOP - SCRIPT.JS
 // ============================================
+
 const menu = [
     // BURGERS
     { category: "Burgers", name: "Chicken Burger Normal", price: 0.500, image: "burger-chicken.jpg" },
@@ -136,3 +137,136 @@ const menu = [
     { category: "Fresh Juices", name: "Abood", price: "0.800/1.000", image: "juice-abood.jpg" },
     { category: "Fresh Juices", name: "Tender Coconut", price: 0.700, image: "juice-tendercoconut.jpg" }
 ];
+
+let cart = [];
+let activeCategory = "All";
+
+document.addEventListener("DOMContentLoaded", () => {
+    initMenu();
+});
+
+function initMenu() {
+    const categoryNav = document.getElementById("category-nav");
+    const menuContainer = document.getElementById("menu-container");
+
+    if (!categoryNav || !menuContainer) return;
+
+    // Get unique categories + "All"
+    const categories = ["All", ...new Set(menu.map(item => item.category))];
+
+    // Render category buttons
+    categoryNav.innerHTML = categories.map(cat => `
+        <button type="button" 
+                class="category-btn ${cat === activeCategory ? 'active' : ''}" 
+                onclick="filterCategory('${cat}')">
+            ${cat}
+        </button>
+    `).join("");
+
+    renderItems(activeCategory);
+}
+
+function filterCategory(category) {
+    activeCategory = category;
+    
+    // Update active button state
+    document.querySelectorAll(".category-btn").forEach(btn => {
+        if (btn.textContent.trim() === category) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
+    renderItems(category);
+}
+
+function renderItems(category) {
+    const menuContainer = document.getElementById("menu-container");
+    if (!menuContainer) return;
+
+    const filtered = category === "All" 
+        ? menu 
+        : menu.filter(item => item.category === category);
+
+    menuContainer.innerHTML = filtered.map((item, index) => {
+        const displayPrice = typeof item.price === 'number' 
+            ? `OMR ${item.price.toFixed(3)}` 
+            : `OMR ${item.price}`;
+
+        return `
+            <div class="menu-card">
+                <div class="menu-card-img">
+                    <img src="/static/images/${item.image}" alt="${item.name}" onerror="this.src='/static/images/logo.png';">
+                </div>
+                <div class="menu-card-content">
+                    <span class="menu-card-category">${item.category}</span>
+                    <h3>${item.name}</h3>
+                    <div class="menu-card-footer">
+                        <span class="price">${displayPrice}</span>
+                        <button type="button" class="add-btn" onclick="addToCart(${index})">Add +</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function toggleCart() {
+    const sidebar = document.getElementById("cart-sidebar");
+    const overlay = document.getElementById("cart-overlay");
+    if (sidebar && overlay) {
+        sidebar.classList.toggle("open");
+        overlay.classList.toggle("active");
+    }
+}
+
+function addToCart(index) {
+    const item = menu[index];
+    const existing = cart.find(cartItem => cartItem.name === item.name);
+    
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ ...item, quantity: 1 });
+    }
+    
+    updateCartUI();
+    toggleCart();
+}
+
+function updateCartUI() {
+    const cartCount = document.getElementById("cart-count");
+    const cartItems = document.getElementById("cart-items");
+    const cartTotalPrice = document.getElementById("cart-total-price");
+
+    let totalCount = 0;
+    let totalPrice = 0;
+
+    if (cartItems) {
+        cartItems.innerHTML = cart.map((item, index) => {
+            totalCount += item.quantity;
+            // Handle parsing numeric value for total price calculation roughly if single number
+            let numericPrice = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+            totalPrice += numericPrice * item.quantity;
+
+            return `
+                <div class="cart-item">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <small>OMR ${numericPrice.toFixed(3)} x ${item.quantity}</small>
+                    </div>
+                    <button type="button" onclick="removeFromCart(${index})">×</button>
+                </div>
+            `;
+        }).join("");
+    }
+
+    if (cartCount) cartCount.textContent = totalCount;
+    if (cartTotalPrice) cartTotalPrice.textContent = `OMR ${totalPrice.toFixed(3)}`;
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartUI();
+}
