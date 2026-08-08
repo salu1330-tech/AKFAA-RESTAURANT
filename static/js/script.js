@@ -1,159 +1,623 @@
-// --- MENU DATA ORGANIZATION ---
-const menuData = [
-    {
-        category: "Burgers",
-        icon: "static/images/cat-burger.jpg", 
-        items: [
-            { name: "Chicken Burger Normal", price: 0.500, img: "static/images/burger-chicken.jpg" },
-            { name: "Beef Burger", price: 0.600, img: "static/images/burger-beef.jpg" },
-            { name: "Zingar Burger", price: 0.700, img: "static/images/burger-zingar.jpg" }
-        ]
-    },
-    {
-        category: "Sandwiches",
-        icon: "static/images/cat-sandwich.jpg",
-        items: [
-            { name: "Zinger Poratta", price: 0.700, img: "static/images/sand-zinger.jpg" },
-            { name: "Club with Chips", price: 1.000, img: "static/images/sand-club.jpg" },
-            { name: "Beef Khubz", price: 0.300, img: "static/images/sand-khubz.jpg" }
-        ]
-    },
-    {
-        category: "Breakfast",
-        icon: "static/images/cat-breakfast.jpg",
-        items: [
-            { name: "Shakshuka", price: 0.500, img: "static/images/brk-shakshuka.jpg" },
-            { name: "Keema", price: 0.500, img: "static/images/brk-keema.jpg" },
-            { name: "Egg Dosa", price: 0.600, img: "static/images/brk-dosa.jpg" }
-        ]
-    },
-    {
-        category: "Milkshakes",
-        icon: "static/images/cat-shake.jpg",
-        items: [
-            { name: "Oreo Shake", price: 0.600, img: "static/images/shake-oreo.jpg" },
-            { name: "Mango Falooda", price: 0.800, img: "static/images/shake-falooda.jpg" },
-            { name: "Classic Vanilla", price: 0.600, img: "static/images/shake-vanilla.jpg" }
-        ]
-    },
-    {
-        category: "Mojitos & Ice Cream",
-        icon: "static/images/cat-mojito.jpg",
-        items: [
-            { name: "Blueberry Mojito", price: 0.800, img: "static/images/mojito-blue.jpg" },
-            { name: "Strawberry Cone", price: 0.200, img: "static/images/ice-straw.jpg" },
-            { name: "Soda Lemon", price: 0.300, img: "static/images/soda-lemon.jpg" }
-        ]
-    },
-    {
-        category: "Fresh Juice",
-        icon: "static/images/cat-juice.jpg",
-        items: [
-            { name: "Fresh Avocado", price: 0.800, img: "static/images/juice-avocado.jpg" },
-            { name: "Pomegranate", price: 0.800, img: "static/images/juice-pom.jpg" },
-            { name: "Cocktail", price: 0.800, img: "static/images/juice-cocktail.jpg" }
-        ]
-    },
-    {
-        category: "Hot Drinks",
-        icon: "static/images/cat-coffee.jpg",
-        items: [
-            { name: "Hot Coffee", price: 0.200, img: "static/images/hot-coffee.jpg" },
-            { name: "Milk Tea", price: 0.100, img: "static/images/hot-tea.jpg" }
-        ]
+// ============================================
+// AKFAA RESTAURANT - ORDER SYSTEM
+// ============================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("AKFAA Restaurant JavaScript loaded");
+
+    // --------------------------------------------
+    // CART
+    // --------------------------------------------
+
+    let cart = [];
+
+    // Try to load existing cart
+    try {
+        const savedCart = localStorage.getItem("akfaa_cart");
+
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+        }
+    } catch (error) {
+        console.error("Could not load cart:", error);
+        cart = [];
     }
-];
 
-// --- RENDER MENU DYNAMICALLY ---
-function renderMenu() {
-    const container = document.getElementById('menu-container');
-    container.innerHTML = ""; 
+    // --------------------------------------------
+    // SAVE CART
+    // --------------------------------------------
 
-    menuData.forEach(category => {
-        const card = document.createElement('div');
-        card.className = 'card';
+    function saveCart() {
+        localStorage.setItem(
+            "akfaa_cart",
+            JSON.stringify(cart)
+        );
+    }
 
-        let htmlContent = `
-            <div class="card-header">
-                <img src="${category.icon}" alt="${category.category}" class="category-icon" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%23d4af37\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 6h16M4 12h16M4 18h16\\'/></svg>'">
-                <h3>${category.category}</h3>
-            </div>
-            <div class="menu-list">
-        `;
+    // --------------------------------------------
+    // GET TABLE NUMBER
+    // --------------------------------------------
 
-        category.items.forEach(item => {
-            htmlContent += `
-                <div class="menu-item">
-                    <div class="item-details">
-                        <img src="${item.img}" alt="${item.name}" class="item-thumbnail" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'%23d4af37\\' viewBox=\\'0 0 24 24\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'10\\'/></svg>'">
-                        <div class="item-text">
-                            <h4>${item.name}</h4>
-                            <span>OMR ${item.price.toFixed(3)}</span>
-                        </div>
-                    </div>
-                    <button class="add-to-cart" onclick="addToCart('${item.name}', ${item.price}, event)">+</button>
-                </div>
-            `;
+    function getTableNumber() {
+
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        return params.get("table") || "1";
+    }
+
+    // --------------------------------------------
+    // ADD TO CART
+    // --------------------------------------------
+
+    document.addEventListener("click", function (event) {
+
+        const button = event.target.closest(
+            "[data-add-to-cart], .add-to-cart, .add-btn"
+        );
+
+        if (!button) {
+            return;
+        }
+
+        const itemName =
+            button.dataset.name ||
+            button.getAttribute("data-item-name") ||
+            button.closest(".menu-item")?.dataset.name ||
+            button.closest(".food-card")?.dataset.name;
+
+        const itemPrice =
+            button.dataset.price ||
+            button.getAttribute("data-item-price") ||
+            button.closest(".menu-item")?.dataset.price ||
+            button.closest(".food-card")?.dataset.price;
+
+        if (!itemName || !itemPrice) {
+            console.warn(
+                "Could not find item name or price",
+                button
+            );
+            return;
+        }
+
+        const price = parseFloat(itemPrice);
+
+        if (isNaN(price)) {
+            console.error("Invalid price:", itemPrice);
+            return;
+        }
+
+        const existingItem = cart.find(
+            item => item.name === itemName
+        );
+
+        if (existingItem) {
+
+            existingItem.quantity += 1;
+
+        } else {
+
+            cart.push({
+                name: itemName,
+                price: price,
+                quantity: 1
+            });
+
+        }
+
+        saveCart();
+
+        updateCart();
+
+        showMessage(
+            `${itemName} added to cart`
+        );
+    });
+
+
+    // --------------------------------------------
+    // UPDATE CART
+    // --------------------------------------------
+
+    function updateCart() {
+
+        let total = 0;
+        let count = 0;
+
+        cart.forEach(item => {
+
+            total +=
+                Number(item.price) *
+                Number(item.quantity);
+
+            count += Number(item.quantity);
+
         });
 
-        htmlContent += `</div>`;
-        card.innerHTML = htmlContent;
-        container.appendChild(card);
-    });
-}
 
-// --- CART LOGIC ---
-let cart = [];
-let total = 0;
+        // Cart count
+        const cartCount =
+            document.querySelector(
+                "#cart-count, .cart-count"
+            );
 
-function toggleCart() {
-    document.getElementById('cart-sidebar').classList.toggle('active');
-}
+        if (cartCount) {
+            cartCount.textContent = count;
+        }
 
-function addToCart(itemName, price, event) {
-    cart.push({ name: itemName, price: price });
-    updateCartUI();
-    
-    const btn = event.target;
-    btn.style.backgroundColor = '#f8f5ee';
-    btn.style.color = '#0a2e1f';
-    setTimeout(() => {
-        btn.style.backgroundColor = '';
-        btn.style.color = '';
-    }, 300);
-}
 
-function updateCartUI() {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const cartCount = document.getElementById('cart-count');
-    const cartTotalPrice = document.getElementById('cart-total-price');
-    
-    cartItemsContainer.innerHTML = '';
-    total = 0;
+        // Total
+        const totalElements =
+            document.querySelectorAll(
+                "#cart-total, .cart-total, [data-cart-total]"
+            );
 
-    cart.forEach((item) => {
-        total += item.price;
-        cartItemsContainer.innerHTML += `
-            <div class="cart-item-row">
-                <span>${item.name}</span>
-                <span style="color: var(--gold);">OMR ${item.price.toFixed(3)}</span>
-            </div>
-        `;
-    });
+        totalElements.forEach(element => {
 
-    cartCount.innerText = cart.length;
-    cartTotalPrice.innerText = `OMR ${total.toFixed(3)}`;
-}
+            element.textContent =
+                `₹${total.toFixed(2)}`;
 
-function checkout() {
-    if(cart.length === 0) {
-        alert("Your cart is empty! Please add items from the menu.");
-        return;
+        });
+
+
+        renderCart();
+
     }
-    alert(`Thank you for your order!\n\nTotal: OMR ${total.toFixed(3)}\nWe will process this right away.`);
-    cart = [];
-    updateCartUI();
-    toggleCart();
-}
 
-window.onload = renderMenu;
+
+    // --------------------------------------------
+    // RENDER CART
+    // --------------------------------------------
+
+    function renderCart() {
+
+        const cartContainer =
+            document.querySelector(
+                "#cart-items, .cart-items"
+            );
+
+        if (!cartContainer) {
+            return;
+        }
+
+        if (cart.length === 0) {
+
+            cartContainer.innerHTML =
+                "<p>Your cart is empty.</p>";
+
+            return;
+        }
+
+
+        cartContainer.innerHTML = "";
+
+
+        cart.forEach((item, index) => {
+
+            const row =
+                document.createElement("div");
+
+            row.className = "cart-item";
+
+
+            row.innerHTML = `
+                <div>
+                    <strong>${escapeHtml(item.name)}</strong>
+                    <br>
+                    ₹${Number(item.price).toFixed(2)}
+                </div>
+
+                <div>
+                    <button
+                        type="button"
+                        class="cart-minus"
+                        data-index="${index}">
+                        −
+                    </button>
+
+                    <span>
+                        ${item.quantity}
+                    </span>
+
+                    <button
+                        type="button"
+                        class="cart-plus"
+                        data-index="${index}">
+                        +
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cart-remove"
+                        data-index="${index}">
+                        ✕
+                    </button>
+                </div>
+            `;
+
+
+            cartContainer.appendChild(row);
+
+        });
+
+    }
+
+
+    // --------------------------------------------
+    // CART BUTTONS
+    // --------------------------------------------
+
+    document.addEventListener("click", function (event) {
+
+        const plus =
+            event.target.closest(".cart-plus");
+
+        const minus =
+            event.target.closest(".cart-minus");
+
+        const remove =
+            event.target.closest(".cart-remove");
+
+
+        if (plus) {
+
+            const index =
+                Number(plus.dataset.index);
+
+            if (cart[index]) {
+
+                cart[index].quantity += 1;
+
+                saveCart();
+
+                updateCart();
+
+            }
+
+            return;
+        }
+
+
+        if (minus) {
+
+            const index =
+                Number(minus.dataset.index);
+
+            if (cart[index]) {
+
+                cart[index].quantity -= 1;
+
+                if (cart[index].quantity <= 0) {
+
+                    cart.splice(index, 1);
+
+                }
+
+                saveCart();
+
+                updateCart();
+
+            }
+
+            return;
+        }
+
+
+        if (remove) {
+
+            const index =
+                Number(remove.dataset.index);
+
+            if (cart[index]) {
+
+                cart.splice(index, 1);
+
+                saveCart();
+
+                updateCart();
+
+            }
+
+        }
+
+    });
+
+
+    // --------------------------------------------
+    // PLACE ORDER
+    // --------------------------------------------
+
+    document.addEventListener("click", function (event) {
+
+        const button =
+            event.target.closest(
+                "#place-order, #placeOrder, .place-order, [data-place-order]"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+
+        placeOrder(button);
+
+    });
+
+
+    // --------------------------------------------
+    // PLACE ORDER FUNCTION
+    // --------------------------------------------
+
+    async function placeOrder(button) {
+
+        console.log("PLACE ORDER CLICKED");
+
+        // Check cart
+        if (!cart || cart.length === 0) {
+
+            alert(
+                "Your cart is empty. Please add items first."
+            );
+
+            return;
+        }
+
+
+        // Prevent double-click
+        button.disabled = true;
+
+        const originalText =
+            button.textContent;
+
+        button.textContent =
+            "Placing Order...";
+
+
+        // Customer name
+        const nameInput =
+            document.querySelector(
+                "#customer-name, #name, input[name='name']"
+            );
+
+
+        // Phone
+        const phoneInput =
+            document.querySelector(
+                "#phone, input[name='phone']"
+            );
+
+
+        // Instructions
+        const instructionsInput =
+            document.querySelector(
+                "#instructions, textarea[name='instructions']"
+            );
+
+
+        // Payment
+        const paymentInput =
+            document.querySelector(
+                "#payment, select[name='payment'], input[name='payment']:checked"
+            );
+
+
+        const name =
+            nameInput ?
+            nameInput.value.trim() :
+            "Guest";
+
+
+        const phone =
+            phoneInput ?
+            phoneInput.value.trim() :
+            "";
+
+
+        const instructions =
+            instructionsInput ?
+            instructionsInput.value.trim() :
+            "";
+
+
+        let payment =
+            "Pay at Counter";
+
+
+        if (paymentInput) {
+
+            payment =
+                paymentInput.value ||
+                "Pay at Counter";
+
+        }
+
+
+        // Prepare order
+        const orderData = {
+
+            table_no: getTableNumber(),
+
+            name: name || "Guest",
+
+            phone: phone,
+
+            instructions: instructions,
+
+            payment: payment,
+
+            items: cart.map(item => ({
+
+                name: item.name,
+
+                price: Number(item.price),
+
+                quantity: Number(item.quantity)
+
+            }))
+
+        };
+
+
+        console.log(
+            "Sending order:",
+            orderData
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/place-order",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                orderData
+                            )
+                    }
+                );
+
+
+            console.log(
+                "Server response:",
+                response.status
+            );
+
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "Order result:",
+                result
+            );
+
+
+            if (
+                response.ok &&
+                result.success
+            ) {
+
+                alert(
+                    `Order placed successfully!\n\nOrder #${result.order_id}`
+                );
+
+
+                // Clear cart
+                cart = [];
+
+                localStorage.removeItem(
+                    "akfaa_cart"
+                );
+
+
+                updateCart();
+
+
+                // Clear form
+                if (nameInput) {
+                    nameInput.value = "";
+                }
+
+                if (phoneInput) {
+                    phoneInput.value = "";
+                }
+
+                if (instructionsInput) {
+                    instructionsInput.value = "";
+                }
+
+
+                // Optional success event
+                document.dispatchEvent(
+                    new CustomEvent(
+                        "orderPlaced",
+                        {
+                            detail: result
+                        }
+                    )
+                );
+
+
+            } else {
+
+                throw new Error(
+                    result.error ||
+                    result.message ||
+                    "Unable to place order"
+                );
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "ORDER ERROR:",
+                error
+            );
+
+
+            alert(
+                "Unable to place order.\n\n" +
+                error.message
+            );
+
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                originalText;
+
+        }
+
+    }
+
+
+    // --------------------------------------------
+    // MESSAGE
+    // --------------------------------------------
+
+    function showMessage(message) {
+
+        console.log(message);
+
+    }
+
+
+    // --------------------------------------------
+    // HTML SAFETY
+    // --------------------------------------------
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    // --------------------------------------------
+    // INITIALIZE
+    // --------------------------------------------
+
+    updateCart();
+
+});
