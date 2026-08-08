@@ -60,10 +60,10 @@ const menu = [
     { category: "Breakfast", name: "Mix Vegetable", price: "0.600/1.000", image: "brk-chana.jpg" },
     { category: "Breakfast", name: "نقانق Fry", price: "0.700/1.000/1.500", image: "brk-chana.jpg" },
     { category: "Breakfast", name: "Beef Fry", price: "1.000/1.500", image: "brk-keema.jpg" },
-    { category: "Breakfast", name: "Milk Tea", price: "0.100/0.200", image: "tea.jpg" },
-    { category: "Breakfast", name: "Coffee", price: "0.200/0.300", image: "coffee.jpg" },
+    { category: "Breakfast", name: "Milk Tea", price: "0.100/0.200", image: "hot-tea.jpg" },
+    { category: "Breakfast", name: "Coffee", price: "0.200/0.300", image: "hot-coffee.jpg" },
 
-    // KHUBZ SANDWICH
+    // KHUBZ SANDWICH & DOSA
     { category: "Khubz Sandwich", name: "Beef Khubz", price: 0.300, image: "khubz-beef.jpg" },
     { category: "Khubz Sandwich", name: "Chicken Khubz", price: 0.300, image: "khubz-chicken.jpg" },
     { category: "Khubz Sandwich", name: "Mix Khubz", price: 0.300, image: "khubz-chicken.jpg" },
@@ -72,10 +72,10 @@ const menu = [
     { category: "Khubz Sandwich", name: "Liver Khubz", price: 0.300, image: "khubz-beef.jpg" },
     { category: "Khubz Sandwich", name: "Egg Khubz", price: 0.300, image: "khubz-chicken.jpg" },
     { category: "Khubz Sandwich", name: "3 Pcs Poratta", price: 0.200, image: "poratta.jpg" },
-    { category: "Khubz Sandwich", name: "Dosa", price: 0.500, image: "dosa.jpg" },
-    { category: "Khubz Sandwich", name: "M. Dosa", price: 0.600, image: "dosa.jpg" },
-    { category: "Khubz Sandwich", name: "Ghee Roast", price: 0.600, image: "dosa.jpg" },
-    { category: "Khubz Sandwich", name: "Egg Dosa", price: 0.600, image: "dosa.jpg" },
+    { category: "Khubz Sandwich", name: "Dosa", price: 0.500, image: "brk-dosa.jpg" },
+    { category: "Khubz Sandwich", name: "M. Dosa", price: 0.600, image: "brk-dosa.jpg" },
+    { category: "Khubz Sandwich", name: "Ghee Roast", price: 0.600, image: "brk-dosa.jpg" },
+    { category: "Khubz Sandwich", name: "Egg Dosa", price: 0.600, image: "brk-dosa.jpg" },
 
     // SHAKES
     { category: "Shakes", name: "Oreo Shake", price: "0.600/0.800/1.000", image: "shake-oreo.jpg" },
@@ -98,8 +98,8 @@ const menu = [
     { category: "Shakes", name: "Pistachio Milkshake", price: "0.600/0.800/1.000", image: "shake-pistachio.jpg" },
 
     // MOJITO & DRINKS
-    { category: "Mojito & Drinks", name: "Blueberry Mojito", price: 0.800, image: "mojito-blue.jpg" },
-    { category: "Mojito & Drinks", name: "Strawberry Mojito", price: 0.800, image: "mojito-strawberry.jpg" },
+    { category: "Mojito & Drinks", name: "Blueberry Mojito", price: 0.800, image: "cat-mojito.jpg" },
+    { category: "Mojito & Drinks", name: "Strawberry Mojito", price: 0.800, image: "cat-mojito.jpg" },
     { category: "Mojito & Drinks", name: "Chocolate Cone", price: "0.200 - 0.300", image: "icecream-cone.jpg" },
     { category: "Mojito & Drinks", name: "Vanilla Cone", price: "0.200 - 0.300", image: "icecream-cone.jpg" },
     { category: "Mojito & Drinks", name: "Strawberry Cone", price: "0.200 - 0.300", image: "icecream-cone.jpg" },
@@ -151,10 +151,8 @@ function initMenu() {
 
     if (!categoryNav || !menuContainer) return;
 
-    // Get unique categories + "All"
     const categories = ["All", ...new Set(menu.map(item => item.category))];
 
-    // Render category buttons
     categoryNav.innerHTML = categories.map(cat => `
         <button type="button" 
                 class="category-btn ${cat === activeCategory ? 'active' : ''}" 
@@ -169,7 +167,6 @@ function initMenu() {
 function filterCategory(category) {
     activeCategory = category;
     
-    // Update active button state
     document.querySelectorAll(".category-btn").forEach(btn => {
         if (btn.textContent.trim() === category) {
             btn.classList.add("active");
@@ -194,6 +191,8 @@ function renderItems(category) {
             ? `OMR ${item.price.toFixed(3)}` 
             : `OMR ${item.price}`;
 
+        const originalIndex = menu.findIndex(m => m.name === item.name && m.category === item.category);
+
         return `
             <div class="menu-card">
                 <div class="menu-card-img">
@@ -204,7 +203,7 @@ function renderItems(category) {
                     <h3>${item.name}</h3>
                     <div class="menu-card-footer">
                         <span class="price">${displayPrice}</span>
-                        <button type="button" class="add-btn" onclick="addToCart(${index})">Add +</button>
+                        <button type="button" class="add-btn" onclick="addToCart(${originalIndex})">Add +</button>
                     </div>
                 </div>
             </div>
@@ -246,7 +245,6 @@ function updateCartUI() {
     if (cartItems) {
         cartItems.innerHTML = cart.map((item, index) => {
             totalCount += item.quantity;
-            // Handle parsing numeric value for total price calculation roughly if single number
             let numericPrice = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
             totalPrice += numericPrice * item.quantity;
 
