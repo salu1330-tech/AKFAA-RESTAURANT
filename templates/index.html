@@ -6,13 +6,11 @@
 
     <title>AKFAA Coffee Shop | مقهى أكفاء</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -58,14 +56,12 @@
 
 
     <!-- =========================
-         HERO
+         MAIN CONTENT & SECTIONS
     ========================== -->
     <main>
 
         <section class="hero" id="home">
-
             <div class="hero-content">
-
                 <span class="eyebrow">
                     WADI KABIR · MUSCAT
                 </span>
@@ -89,7 +85,6 @@
                         Find Us
                     </a>
                 </div>
-
             </div>
 
             <div class="hero-decoration" aria-hidden="true">
@@ -97,15 +92,11 @@
                 <span></span>
                 <span></span>
             </div>
-
         </section>
 
 
-        <!-- =========================
-             QUICK INFO
-        ========================== -->
+        <!-- QUICK INFO -->
         <section class="quick-info" aria-label="Restaurant information">
-
             <div class="info-item">
                 <span class="info-icon">☕</span>
                 <div>
@@ -133,19 +124,14 @@
                     <small>Muscat, Oman</small>
                 </div>
             </div>
-
         </section>
 
 
-        <!-- =========================
-             ABOUT
-        ========================== -->
+        <!-- ABOUT -->
         <section class="about-section section-shell" id="about">
-
             <div class="section-kicker">WELCOME TO AKFAA</div>
 
             <div class="about-grid">
-
                 <div>
                     <h2>
                         A simple place for
@@ -164,21 +150,14 @@
                         Browse our menu <span>→</span>
                     </a>
                 </div>
-
             </div>
-
         </section>
 
 
-        <!-- =========================
-             MENU
-        ========================== -->
+        <!-- MENU -->
         <section class="menu-section" id="menu">
-
             <div class="section-shell">
-
                 <div class="menu-heading">
-
                     <div>
                         <div class="section-kicker">WHAT WE SERVE</div>
                         <h2>Our Menu</h2>
@@ -187,36 +166,27 @@
                     <p>
                         Choose your favourite and add it to your order.
                     </p>
-
                 </div>
-
 
                 <!-- CATEGORY FILTERS -->
                 <div class="category-nav"
                      id="category-nav"
                      role="tablist"
                      aria-label="Menu categories">
-                    <!-- JavaScript inserts category buttons -->
+                    <!-- JavaScript inserts category buttons dynamically -->
                 </div>
-
 
                 <!-- MENU ITEMS -->
                 <div class="menu-grid" id="menu-container">
-                    <!-- JavaScript inserts menu cards -->
+                    <!-- JavaScript inserts menu cards dynamically -->
                 </div>
-
             </div>
-
         </section>
 
 
-        <!-- =========================
-             CONTACT
-        ========================== -->
+        <!-- CONTACT -->
         <section class="contact-section section-shell" id="contact">
-
             <div class="contact-card">
-
                 <div class="contact-main">
                     <div class="section-kicker">COME VISIT US</div>
 
@@ -231,7 +201,6 @@
                 </div>
 
                 <div class="contact-details">
-
                     <a href="tel:92761897">
                         <span>Phone</span>
                         <strong>92761897</strong>
@@ -241,34 +210,26 @@
                         <span>WhatsApp</span>
                         <strong>93079614</strong>
                     </a>
-
                 </div>
-
             </div>
-
         </section>
 
     </main>
 
 
     <!-- =========================
-         CART OVERLAY
+         CART OVERLAY & SIDEBAR
     ========================== -->
     <div class="cart-overlay"
          id="cart-overlay"
          onclick="toggleCart()"></div>
 
-
-    <!-- =========================
-         CART SIDEBAR
-    ========================== -->
     <aside class="cart-sidebar"
            id="cart-sidebar"
            aria-label="Your order"
            aria-hidden="true">
 
         <div class="cart-header">
-
             <div>
                 <span class="cart-kicker">YOUR ORDER</span>
                 <h2>Your Cart</h2>
@@ -280,25 +241,20 @@
                     aria-label="Close cart">
                 ×
             </button>
-
         </div>
-
 
         <!-- CART ITEMS -->
         <div class="cart-items" id="cart-items">
-            <!-- JavaScript inserts cart items -->
+            <!-- JavaScript inserts cart items dynamically -->
         </div>
-
 
         <!-- CHECKOUT -->
         <div class="checkout-panel">
-
             <div class="checkout-title">
                 <span>Order details</span>
             </div>
 
             <div class="form-grid">
-
                 <div class="field">
                     <label for="table-number">Table</label>
                     <input type="text"
@@ -329,7 +285,6 @@
                     <label for="customer-instructions">
                         Special Instructions
                     </label>
-
                     <textarea id="customer-instructions"
                               placeholder="Example: No onions, extra spicy"
                               maxlength="500"></textarea>
@@ -337,28 +292,22 @@
 
                 <div class="field field-wide">
                     <label>Payment</label>
-
                     <label class="payment-choice">
                         <input type="radio"
                                name="payment"
                                value="Pay at Counter"
                                checked>
-
                         <span>
                             <strong>Pay at Counter</strong>
                             <small>Pay when your order is served</small>
                         </span>
                     </label>
                 </div>
-
             </div>
-
         </div>
-
 
         <!-- TOTAL + ORDER -->
         <div class="cart-footer">
-
             <div class="cart-total">
                 <span>Total</span>
                 <strong id="cart-total-price">OMR 0.000</strong>
@@ -370,7 +319,6 @@
                 <span>Place Order</span>
                 <span>→</span>
             </button>
-
         </div>
 
     </aside>
