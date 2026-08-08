@@ -43,7 +43,7 @@
     gap: 28px;
 }
 
-/* MENU CARD */
+/* MENU CARD (Unified Category Container) */
 .card {
     background: var(--card-bg);
     border: 1px solid rgba(223, 177, 91, 0.18);
