@@ -1,8 +1,19 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
+import json
 from datetime import datetime
 
+
+# ============================================
+# FLASK APPLICATION
+# ============================================
+
 app = Flask(__name__)
+
+
+# ============================================
+# DATABASE
+# ============================================
 
 DATABASE = "orders.db"
 
@@ -37,13 +48,22 @@ def init_db():
     print("Database initialized successfully.")
 
 
+# ============================================
+# HOME PAGE
+# ============================================
+
 @app.route("/")
 def home():
+
     return render_template(
         "index.html",
         table_no="Walk-in"
     )
 
+
+# ============================================
+# PLACE ORDER API
+# ============================================
 
 @app.route("/place-order", methods=["POST"])
 def place_order():
@@ -56,11 +76,17 @@ def place_order():
             "message": "Invalid order data."
         }), 400
 
+
+    # CHECK CART
+
     if not data.get("items"):
         return jsonify({
             "success": False,
             "message": "Cart is empty."
         }), 400
+
+
+    # CHECK CUSTOMER NAME
 
     if not data.get("customer_name"):
         return jsonify({
@@ -68,9 +94,13 @@ def place_order():
             "message": "Customer name is required."
         }), 400
 
-    import json
+
+    # CONNECT TO DATABASE
 
     conn = get_db_connection()
+
+
+    # SAVE ORDER
 
     cursor = conn.execute("""
         INSERT INTO orders (
@@ -85,21 +115,49 @@ def place_order():
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
+
         data.get("table_number", ""),
+
         data.get("customer_name", ""),
+
         data.get("customer_phone", ""),
+
         data.get("instructions", ""),
-        data.get("payment_method", "Pay at Counter"),
-        json.dumps(data.get("items", [])),
+
+        data.get(
+            "payment_method",
+            "Pay at Counter"
+        ),
+
+        json.dumps(
+            data.get("items", [])
+        ),
+
         data.get("total", 0),
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
     ))
+
+
+    # SAVE CHANGES
 
     conn.commit()
 
+
+    # GET ORDER ID
+
     order_id = cursor.lastrowid
 
+
+    # CLOSE DATABASE
+
     conn.close()
+
+
+    # SEND RESPONSE
 
     return jsonify({
         "success": True,
@@ -107,6 +165,10 @@ def place_order():
         "message": "Order placed successfully."
     })
 
+
+# ============================================
+# RUN APPLICATION
+# ============================================
 
 if __name__ == "__main__":
 
