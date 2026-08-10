@@ -1,318 +1,299 @@
-<!DOCTYPE html>
-<html lang="en">
+<meta charset="UTF-8">
 
-<head>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<title>AKFAA Coffee Shop | مقهى أكفاء</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
 
-    <title>AKFAA Coffee Shop | مقهى أكفاء</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}">
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
-        rel="stylesheet">
-
-</head>
+<link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet">
 
 
-<body>
+<!-- MAIN APPLICATION -->
 
-    <!-- MAIN APPLICATION -->
-
-    <main class="restaurant-app">
+<main class="restaurant-app">
 
 
-        <!-- LEFT SIDE -->
+    <!-- LEFT SIDE -->
 
-        <section class="menu-area">
+    <section class="menu-area">
 
 
-            <!-- HEADER -->
+        <!-- HEADER -->
 
-            <header class="menu-header">
+        <header class="menu-header">
 
-                <div class="brand">
+            <div class="brand">
 
-                    <img
-                        src="{{ url_for('static', filename='images/logo.png') }}"
-                        alt="AKFAA Coffee Shop"
-                        class="logo">
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="AKFAA Coffee Shop"
+                    class="logo">
 
-                    <div>
+                <div>
 
-                        <h1>
-                            AKFAA Coffee Shop
-                        </h1>
+                    <h1>
+                        AKFAA Coffee Shop
+                    </h1>
 
-                        <p>
-                            أكفاء للأعمال والتطوير
-                        </p>
-
-                    </div>
+                    <p>
+                        أكفاء للأعمال والتطوير
+                    </p>
 
                 </div>
-
-
-                <button
-                    type="button"
-                    class="mobile-cart-button"
-                    onclick="toggleMobileCart()">
-
-                    🛒
-                    <span id="mobile-cart-count">
-                        0
-                    </span>
-
-                </button>
-
-            </header>
-
-
-            <!-- MENU -->
-
-            <div
-                id="menu-container"
-                class="menu-categories">
-
-                <!-- JavaScript creates categories -->
 
             </div>
 
 
-        </section>
+            <button
+                type="button"
+                class="mobile-cart-button"
+                onclick="toggleMobileCart()">
+
+                🛒
+                <span id="mobile-cart-count">
+                    0
+                </span>
+
+            </button>
+
+        </header>
 
 
-        <!-- RIGHT ORDER PANEL -->
+        <!-- MENU -->
 
-        <aside
-            class="order-panel"
-            id="order-panel">
+        <div
+            id="menu-container"
+            class="menu-categories">
+
+            <!-- JavaScript creates categories -->
+
+        </div>
 
 
-            <!-- ORDER HEADER -->
+    </section>
 
-            <div class="order-header">
 
-                <h2>
-                    Your Order
-                </h2>
+    <!-- RIGHT ORDER PANEL -->
 
-                <button
-                    type="button"
-                    class="close-mobile-cart"
-                    onclick="toggleMobileCart()">
+    <aside
+        class="order-panel"
+        id="order-panel">
 
-                    ×
 
-                </button>
+        <!-- ORDER HEADER -->
+
+        <div class="order-header">
+
+            <h2>
+                Your Order
+            </h2>
+
+            <button
+                type="button"
+                class="close-mobile-cart"
+                onclick="toggleMobileCart()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <!-- CART ITEMS -->
+
+        <div
+            id="cart-items"
+            class="order-items">
+
+        </div>
+
+
+        <!-- CHECKOUT -->
+
+        <div class="checkout-section">
+
+
+            <div class="total-row">
+
+                <span>
+                    Total:
+                </span>
+
+                <strong id="cart-total-price">
+
+                    OMR 0.000
+
+                </strong>
 
             </div>
 
 
-            <!-- CART ITEMS -->
+            <!-- TABLE -->
 
-            <div
-                id="cart-items"
-                class="order-items">
+            <div class="form-field">
+
+                <label for="table-number">
+
+                    Table Number:
+
+                </label>
+
+                <input
+                    type="text"
+                    id="table-number"
+                    value="{{ table_no }}"
+                    readonly>
 
             </div>
 
 
-            <!-- CHECKOUT -->
+            <!-- CUSTOMER NAME -->
 
-            <div class="checkout-section">
+            <div class="form-field">
 
+                <label for="customer-name">
 
-                <div class="total-row">
+                    Name
 
-                    <span>
-                        Total:
-                    </span>
+                </label>
 
-                    <strong id="cart-total-price">
+                <input
+                    type="text"
+                    id="customer-name"
+                    placeholder="Enter your name">
 
-                        OMR 0.000
-
-                    </strong>
-
-                </div>
+            </div>
 
 
-                <!-- TABLE -->
+            <!-- PHONE -->
 
-                <div class="form-field">
+            <div class="form-field">
 
-                    <label for="table-number">
+                <label for="customer-phone">
 
-                        Table Number:
+                    Phone
 
-                    </label>
+                </label>
 
-                    <input
-                        type="text"
-                        id="table-number"
-                        value="{{ table_no }}"
-                        readonly>
+                <input
+                    type="tel"
+                    id="customer-phone"
+                    placeholder="Enter phone number">
 
-                </div>
-
-
-                <!-- CUSTOMER NAME -->
-
-                <div class="form-field">
-
-                    <label for="customer-name">
-
-                        Name
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="customer-name"
-                        placeholder="Enter your name">
-
-                </div>
+            </div>
 
 
-                <!-- PHONE -->
+            <!-- SPECIAL -->
 
-                <div class="form-field">
+            <div class="form-field">
 
-                    <label for="customer-phone">
+                <label for="customer-instructions">
 
-                        Phone
+                    Special Instructions
 
-                    </label>
+                </label>
 
-                    <input
-                        type="tel"
-                        id="customer-phone"
-                        placeholder="Enter phone number">
+                <textarea
+                    id="customer-instructions"
+                    placeholder="Any special request?"></textarea>
 
-                </div>
-
-
-                <!-- SPECIAL -->
-
-                <div class="form-field">
-
-                    <label for="customer-instructions">
-
-                        Special Instructions
-
-                    </label>
-
-                    <textarea
-                        id="customer-instructions"
-                        placeholder="Any special request?"></textarea>
-
-                </div>
+            </div>
 
 
-                <!-- PAYMENT -->
+            <!-- PAYMENT -->
 
-                <div class="payment-section">
+            <div class="payment-section">
+
+                <label>
+                    Payment Method
+                </label>
+
+                <div class="payment-options">
 
                     <label>
-                        Payment Method
+
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="Pay at Counter"
+                            checked>
+
+                        Pay at Counter
+
                     </label>
 
-                    <div class="payment-options">
 
-                        <label>
+                    <label>
 
-                            <input
-                                type="radio"
-                                name="payment"
-                                value="Pay at Counter"
-                                checked>
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="Cash">
 
-                            Pay at Counter
+                        Cash
 
-                        </label>
-
-
-                        <label>
-
-                            <input
-                                type="radio"
-                                name="payment"
-                                value="Cash">
-
-                            Cash
-
-                        </label>
-
-                    </div>
+                    </label>
 
                 </div>
-
-
-                <!-- PLACE ORDER -->
-
-                <button
-                    type="button"
-                    id="place-order-button"
-                    class="place-order-btn">
-
-                    PLACE ORDER
-
-                </button>
-
 
             </div>
 
 
-        </aside>
+            <!-- PLACE ORDER -->
+
+            <button
+                type="button"
+                id="place-order-button"
+                class="place-order-btn">
+
+                PLACE ORDER
+
+            </button>
 
 
-    </main>
+        </div>
 
 
-    <!-- MOBILE OVERLAY -->
-
-    <div
-        class="mobile-overlay"
-        id="mobile-overlay"
-        onclick="toggleMobileCart()">
-
-    </div>
+    </aside>
 
 
-    <!-- MENU DATA -->
-
-    <script
-        src="{{ url_for('static', filename='js/menu-data.js') }}">
-    </script>
+</main>
 
 
-    <!-- WEBSITE LOGIC -->
+<!-- MOBILE OVERLAY -->
 
-    <script
-        src="{{ url_for('static', filename='js/script.js') }}">
-    </script>
+<div
+    class="mobile-overlay"
+    id="mobile-overlay"
+    onclick="toggleMobileCart()">
+
+</div>
 
 
-</body>
+<!-- MENU DATA -->
 
-</html><script src="{{ url_for('static', filename='js/menu-data.js') }}"></script>
+<script
+    src="{{ url_for('static', filename='js/menu-data.js') }}">
+</script>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
-</body>
-</html>
+<!-- WEBSITE LOGIC -->
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}">
+</script>

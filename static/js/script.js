@@ -1,1331 +1,909 @@
 // ============================================
 // AKFAA COFFEE SHOP
-// RESTAURANT ORDER SYSTEM
+// COMPLETE MENU DATA
+// File: static/js/menu-data.js
 // ============================================
 
-"use strict";
+const menu = [
 
-let cart = [];
+    // ========================================
+    // BURGERS
+    // ========================================
+
+    {
+        category: "Burgers",
+        name: "Chicken Burger Normal",
+        price: 0.500,
+        image: "chicken_burger_normal.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Chicken Burger with Cheese",
+        price: 0.500,
+        image: "chicken_burger_cheese.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Chicken Burger Special",
+        price: 0.600,
+        image: "chicken_burger_special.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Chicken Fillet",
+        price: 0.600,
+        image: "chicken_fillet.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Beef Burger",
+        price: 0.600,
+        image: "beef_burger.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Prawns Jumbo Burger",
+        price: 0.500,
+        image: "prawns_jumbo_burger.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Vegetable Burger",
+        price: 0.300,
+        image: "vegetable_burger.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Chicken with Bun",
+        price: 0.300,
+        image: "chicken_with_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Meat with Bun",
+        price: 0.300,
+        image: "meat_with_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Egg with Bun",
+        price: 0.300,
+        image: "egg_with_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Egg with Cheese Bun",
+        price: 0.300,
+        image: "egg_cheese_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Hot Dog with Bun",
+        price: 0.300,
+        image: "hotdog_with_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Falafel with Bun",
+        price: 0.300,
+        image: "falafel_with_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Egg with Oman Chips & Cheese",
+        price: 0.350,
+        image: "egg_oman_chips_cheese.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Oman Chips with Bun",
+        price: 0.200,
+        image: "oman_chips_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Egg Boiled Bun",
+        price: 0.300,
+        image: "egg_boiled_bun.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Zinger Burger",
+        price: 0.700,
+        image: "zingar_burger.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Nuggets Burger",
+        price: 0.500,
+        image: "nuggets_burger.jpg"
+    },
+
+    {
+        category: "Burgers",
+        name: "Egg Cheese with Slice Bread",
+        price: 0.300,
+        image: "egg_cheese_slice_bread.jpg"
+    },
 
 
-// ============================================
-// CHECK MENU DATA
-// ============================================
+    // ========================================
+    // PORATTA SANDWICH
+    // ========================================
 
-function getMenuData() {
+    {
+        category: "Poratta Sandwich",
+        name: "Zinger Poratta",
+        price: 0.700,
+        image: "zinger_poratta.jpg"
+    },
 
-    if (
-        typeof window.menu === "undefined" ||
-        !Array.isArray(window.menu)
-    ) {
+    {
+        category: "Poratta Sandwich",
+        name: "Chilli Poratta",
+        price: 0.400,
+        image: "chilli_poratta.jpg"
+    },
 
-        console.error("AKFAA ERROR: menu-data.js was not loaded.");
+    {
+        category: "Poratta Sandwich",
+        name: "Beef Poratta",
+        price: 0.400,
+        image: "beef_poratta.jpg"
+    },
 
-        return [];
+    {
+        category: "Poratta Sandwich",
+        name: "Chicken Poratta",
+        price: 0.400,
+        image: "chicken_masonic.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Nutella Poratta",
+        price: 0.300,
+        image: "nutella_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Oman Chips Poratta",
+        price: 0.300,
+        image: "oman_chips_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Shakshuka Poratta",
+        price: 0.400,
+        image: "shakshook_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Egg Cheese Poratta",
+        price: 0.400,
+        image: "egg_cheese_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Nuggets Poratta",
+        price: 0.500,
+        image: "nuggets_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Keema Poratta",
+        price: 0.300,
+        image: "keema_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Hot Dog Poratta",
+        price: 0.300,
+        image: "hot_dog_poratta.jpg"
+    },
+
+    {
+        category: "Poratta Sandwich",
+        name: "Falafel Poratta",
+        price: 0.300,
+        image: "falafel_poratta.jpg"
+    },
+
+
+    // ========================================
+    // CLUB SANDWICH
+    // ========================================
+
+    {
+        category: "Club Sandwich",
+        name: "Club with Chips",
+        price: 1.000,
+        image: "club_with_chips.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Vegetable Club",
+        price: 0.800,
+        image: "vegetable_club.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Dum Dum Special",
+        price: 1.000,
+        image: "dum_dum_special.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Club Sada",
+        price: 0.800,
+        image: "club_sada.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Jazeera Club",
+        price: 1.000,
+        image: "jazeera_club.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Club Bahrain Special",
+        price: 1.000,
+        image: "club_bahrain_special.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Club Saudi",
+        price: 1.000,
+        image: "club_saudi.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Prawns Club",
+        price: 1.000,
+        image: "prawns_club.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Club Emarat",
+        price: 1.000,
+        image: "club_emarat.jpg"
+    },
+
+    {
+        category: "Club Sandwich",
+        name: "Hot Dog Club",
+        price: 1.000,
+        image: "hot_dog_club.jpg"
+    },
+
+
+    // ========================================
+    // KHUBZ SANDWICH
+    // ========================================
+
+    {
+        category: "Khubz Sandwich",
+        name: "Beef Khubz",
+        price: 0.300,
+        image: "beef_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Chicken Khubz",
+        price: 0.300,
+        image: "chicken_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Mix Khubz",
+        price: 0.300,
+        image: "mix_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Hot Dog Khubz",
+        price: 0.300,
+        image: "hotdog_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Falafel Khubz",
+        price: 0.300,
+        image: "falafel_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Liver Khubz",
+        price: 0.300,
+        image: "liver_khubz.jpg"
+    },
+
+    {
+        category: "Khubz Sandwich",
+        name: "Egg Khubz",
+        price: 0.300,
+        image: "egg_khubz.jpg"
+    },
+
+
+    // ========================================
+    // BREAKFAST
+    // ========================================
+
+    {
+        category: "Breakfast",
+        name: "3 Pcs Poratta",
+        price: 0.200,
+        image: "3_pcs_poratta.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Dosa",
+        price: 0.500,
+        image: "dosa.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Ghee Roast",
+        price: 0.600,
+        image: "ghee_roast_dosa.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Egg Dosa",
+        price: 0.600,
+        image: "egg_dosa.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Masala Dosa",
+        price: 0.600,
+        image: "masala_dosa.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Shakshuka",
+        price: 0.500,
+        image: "shakshuka.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Keema",
+        price: 0.500,
+        image: "keema.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Chicken Chukka",
+        price: 1.000,
+        image: "chicken_chukka.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Chilli Chicken",
+        price: 1.000,
+        image: "chilli_chicken.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Dal Fry",
+        price: 0.500,
+        image: "dal_fry.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Chana Masala",
+        price: 0.600,
+        image: "chana_masala.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Mix Vegetable",
+        price: 0.600,
+        image: "mix_vegetable.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Hot Dog Fry",
+        price: 0.700,
+        image: "hot_dog_fry.jpg"
+    },
+
+    {
+        category: "Breakfast",
+        name: "Beef Fry",
+        price: 1.000,
+        image: "beef_fry.jpg"
+    },
+
+
+    // ========================================
+    // HOT BEVERAGES
+    // ========================================
+
+    {
+        category: "Hot Beverages",
+        name: "Milk Tea",
+        price: 0.100,
+        image: "milk_tea.jpg"
+    },
+
+    {
+        category: "Hot Beverages",
+        name: "Coffee",
+        price: 0.200,
+        image: "coffee.jpg"
+    },
+
+
+    // ========================================
+    // SHAKES
+    // ========================================
+
+    {
+        category: "Shakes",
+        name: "Oreo Shake",
+        price: 0.600,
+        image: "oreo_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Snickers Shake",
+        price: 0.600,
+        image: "snickers_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Mango Shake",
+        price: 0.600,
+        image: "mango_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Awar Qalb Shake",
+        price: 0.600,
+        image: "awar_qalb.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Computer Shake",
+        price: 0.600,
+        image: "computer_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "KitKat Shake",
+        price: 0.600,
+        image: "kitkat_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Kinder Shake",
+        price: 0.600,
+        image: "kinder_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Galaxy Shake",
+        price: 0.600,
+        image: "galaxy_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Lotus Shake",
+        price: 0.600,
+        image: "lotus_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Chocolate Milkshake",
+        price: 0.600,
+        image: "chocolate_milkshake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Classic Vanilla Milkshake",
+        price: 0.600,
+        image: "vanilla_milkshake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Strawberry Milkshake",
+        price: 0.600,
+        image: "strawberry_milkshake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Pistachio Milkshake",
+        price: 0.600,
+        image: "pistachio_milkshake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Avil Milkshake",
+        price: 0.600,
+        image: "avil_milk_shake.jpg"
+    },
+
+    {
+        category: "Shakes",
+        name: "Chikku Shake",
+        price: 0.600,
+        image: "chikku_shake.jpg"
+    },
+
+
+    // ========================================
+    // FALOODA
+    // ========================================
+
+    {
+        category: "Falooda",
+        name: "Strawberry Falooda",
+        price: 0.800,
+        image: "strawberry_falooda.jpg"
+    },
+
+    {
+        category: "Falooda",
+        name: "Mango Falooda",
+        price: 0.800,
+        image: "mango_falooda.jpg"
+    },
+
+    {
+        category: "Falooda",
+        name: "Kulfi Falooda",
+        price: 0.800,
+        image: "kulfi_falooda.jpg"
+    },
+
+    {
+        category: "Falooda",
+        name: "Vanilla Falooda",
+        price: 0.800,
+        image: "vanilla_falooda.jpg"
+    },
+
+    {
+        category: "Falooda",
+        name: "Bombo Falooda",
+        price: 0.800,
+        image: "bombo_falooda.jpg"
+    },
+
+
+    // ========================================
+    // MOJITO & SODA
+    // ========================================
+
+    {
+        category: "Mojito & Soda",
+        name: "Blueberry Mojito",
+        price: 0.800,
+        image: "blueberry_mojito.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Strawberry Mojito",
+        price: 0.800,
+        image: "strawberry_mojito.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Soda Lemon",
+        price: 0.300,
+        image: "soda_lemon.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Soda Surbath",
+        price: 0.500,
+        image: "soda_surbath.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Normal Surbath",
+        price: 0.500,
+        image: "normal_surbath.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Milk Surbath",
+        price: 0.600,
+        image: "milk_surbath.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Orange Surbath",
+        price: 0.600,
+        image: "orange_surbath.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Morra Soda",
+        price: 0.500,
+        image: "morra_soda.jpg"
+    },
+
+    {
+        category: "Mojito & Soda",
+        name: "Watermelon Soda",
+        price: 0.500,
+        image: "water_melon_soda.jpg"
+    },
+
+
+    // ========================================
+    // ICE CREAM
+    // ========================================
+
+    {
+        category: "Ice Cream",
+        name: "Chocolate Cone",
+        price: 0.200,
+        image: "chocolate_cone.jpg"
+    },
+
+    {
+        category: "Ice Cream",
+        name: "Vanilla Cone",
+        price: 0.200,
+        image: "vanilla_cone.jpg"
+    },
+
+    {
+        category: "Ice Cream",
+        name: "Strawberry Cone",
+        price: 0.200,
+        image: "strawberry_cone.jpg"
+    },
+
+    {
+        category: "Ice Cream",
+        name: "Ice Cream Bowl",
+        price: 0.200,
+        image: "ice_cream_bowl.jpg"
+    },
+
+
+    // ========================================
+    // FRESH JUICE
+    // ========================================
+
+    {
+        category: "Fresh Juice",
+        name: "Carrot Juice",
+        price: 0.800,
+        image: "carrot_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Avocado Juice",
+        price: 0.800,
+        image: "avocado_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Pomegranate Juice",
+        price: 0.800,
+        image: "pomegranate_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Sweet Melon Juice",
+        price: 0.800,
+        image: "sweet_melon_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Lemon Mint",
+        price: 0.500,
+        image: "lemon_mint.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Orange Juice",
+        price: 0.800,
+        image: "orange_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Cocktail",
+        price: 0.800,
+        image: "cocktail.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Banana Juice",
+        price: 0.500,
+        image: "banana_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Papaya Juice",
+        price: 0.800,
+        image: "papaya_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Pineapple Juice",
+        price: 0.800,
+        image: "pineapple_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Lemon Juice",
+        price: 0.800,
+        image: "lemon_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Mango Juice",
+        price: 0.800,
+        image: "mango_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Kiwi Juice",
+        price: 0.800,
+        image: "kiwi_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Strawberry Juice",
+        price: 0.800,
+        image: "strawberry_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Mango Banana Juice",
+        price: 0.800,
+        image: "mango_banana_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Thabakath Juice",
+        price: 0.800,
+        image: "thabakath_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Beetroot Juice",
+        price: 0.800,
+        image: "beetroot_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Coconut Juice",
+        price: 0.800,
+        image: "coconut_juice.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Passion Fruit",
+        price: 0.800,
+        image: "passion_fruit.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Tender Coconut",
+        price: 0.700,
+        image: "tender_coconut.jpg"
+    },
+
+    {
+        category: "Fresh Juice",
+        name: "Abood Juice",
+        price: 0.800,
+        image: "abood_juice.jpg"
     }
 
-    return window.menu;
-}
+];
 
 
 // ============================================
-// FORMAT PRICE
+// MAKE MENU AVAILABLE TO SCRIPT.JS
 // ============================================
 
-function formatPrice(price) {
-
-    if (price === undefined || price === null) {
-
-        return "OMR 0.000";
-    }
-
-
-    const priceText = String(price).trim();
-
-
-    // Keep multiple prices exactly as written
-    // Example: 0.500/1.000
-
-    if (priceText.includes("/")) {
-
-        return `OMR ${priceText}`;
-    }
-
-
-    const numericPrice = Number(priceText);
-
-
-    if (Number.isNaN(numericPrice)) {
-
-        return `OMR ${priceText}`;
-    }
-
-
-    return `OMR ${numericPrice.toFixed(3)}`;
-}
+window.menu = menu;
 
 
 // ============================================
-// GET NUMERIC PRICE
-// USED FOR CART CALCULATION
+// DEBUG
 // ============================================
 
-function getNumericPrice(price) {
-
-    if (typeof price === "number") {
-
-        return price;
-    }
-
-
-    const match = String(price)
-        .match(/\d+(?:\.\d+)?/);
-
-
-    if (!match) {
-
-        return 0;
-    }
-
-
-    return Number(match[0]);
-}
-
-
-// ============================================
-// ESCAPE HTML
-// ============================================
-
-function escapeHTML(value) {
-
-    return String(value ?? "")
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
-}
-
-
-// ============================================
-// GET UNIQUE CATEGORIES
-// ============================================
-
-function getCategories() {
-
-    const menuData = getMenuData();
-
-
-    return [
-
-        ...new Set(
-
-            menuData.map(item => item.category)
-
-        )
-
-    ];
-}
-
-
-// ============================================
-// GET CATEGORY IMAGE
-// ============================================
-
-function getCategoryImage(category) {
-
-    const menuData = getMenuData();
-
-
-    const firstItem = menuData.find(
-
-        item => item.category === category
-
-    );
-
-
-    if (!firstItem) {
-
-        return "";
-    }
-
-
-    return `/static/images/${encodeURIComponent(firstItem.image)}`;
-}
-
-
-// ============================================
-// RENDER FULL MENU
-// ============================================
-
-function renderMenu() {
-
-    console.log("Rendering AKFAA menu...");
-
-
-    const container =
-
-        document.getElementById("menu-container");
-
-
-    if (!container) {
-
-        console.error(
-            "ERROR: #menu-container was not found"
-        );
-
-        return;
-    }
-
-
-    const menuData = getMenuData();
-
-
-    console.log(
-        "Total menu items found:",
-        menuData.length
-    );
-
-
-    // ----------------------------------------
-    // MENU DATA ERROR
-    // ----------------------------------------
-
-    if (menuData.length === 0) {
-
-        container.innerHTML = `
-
-            <div class="menu-error">
-
-                <h2>
-                    Menu data not found
-                </h2>
-
-                <p>
-                    Please check menu-data.js
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    // ----------------------------------------
-    // GET CATEGORIES
-    // ----------------------------------------
-
-    const categories = getCategories();
-
-
-    // ----------------------------------------
-    // BUILD MENU
-    // ----------------------------------------
-
-    container.innerHTML = categories.map(category => {
-
-
-        const categoryItems =
-
-            menuData.filter(
-
-                item => item.category === category
-
-            );
-
-
-        const categoryImage =
-
-            getCategoryImage(category);
-
-
-        return `
-
-            <section class="category-card">
-
-
-                <!-- CATEGORY HEADER -->
-
-                <div class="category-header">
-
-
-                    <img
-
-                        class="category-image"
-
-                        src="${categoryImage}"
-
-                        alt="${escapeHTML(category)}"
-
-                        onerror="this.style.display='none';"
-
-                    >
-
-
-                    <h2>
-
-                        ${escapeHTML(category)}
-
-                    </h2>
-
-
-                </div>
-
-
-
-                <!-- CATEGORY ITEMS -->
-
-                <div class="category-items">
-
-
-                    ${categoryItems.map(item => {
-
-
-                        const itemIndex =
-
-                            menuData.indexOf(item);
-
-
-                        return `
-
-                            <div class="menu-item">
-
-
-                                <img
-
-                                    class="menu-image"
-
-                                    src="/static/images/${encodeURIComponent(item.image)}"
-
-                                    alt="${escapeHTML(item.name)}"
-
-                                    onerror="this.style.display='none';"
-
-                                >
-
-
-
-                                <div class="menu-item-content">
-
-
-                                    <h3>
-
-                                        ${escapeHTML(item.name)}
-
-                                    </h3>
-
-
-                                    <div class="menu-price">
-
-                                        ${formatPrice(item.price)}
-
-                                    </div>
-
-
-                                </div>
-
-
-
-                                <button
-
-                                    type="button"
-
-                                    class="add-to-cart"
-
-                                    onclick="addToCart(${itemIndex})"
-
-                                    aria-label="Add ${escapeHTML(item.name)}"
-
-                                >
-
-                                    +
-
-                                </button>
-
-
-                            </div>
-
-                        `;
-
-
-                    }).join("")}
-
-
-                </div>
-
-
-            </section>
-
-        `;
-
-
-    }).join("");
-
-
-    console.log(
-        "AKFAA menu rendered successfully"
-    );
-}
-
-
-// ============================================
-// ADD TO CART
-// ============================================
-
-function addToCart(index) {
-
-    const menuData = getMenuData();
-
-
-    const item = menuData[index];
-
-
-    if (!item) {
-
-        console.error(
-            "Menu item not found:",
-            index
-        );
-
-        return;
-    }
-
-
-    const existingItem =
-
-        cart.find(
-
-            cartItem =>
-
-                cartItem.index === index
-
-        );
-
-
-    if (existingItem) {
-
-        existingItem.quantity += 1;
-
-    }
-
-    else {
-
-        cart.push({
-
-            index: index,
-
-            name: item.name,
-
-            category: item.category,
-
-            displayPrice: item.price,
-
-            price: getNumericPrice(item.price),
-
-            quantity: 1
-
-        });
-
-    }
-
-
-    renderCart();
-
-    updateMobileCartCount();
-}
-
-
-window.addToCart = addToCart;
-
-
-// ============================================
-// UPDATE QUANTITY
-// ============================================
-
-function updateQuantity(index, change) {
-
-    const item =
-
-        cart.find(
-
-            cartItem =>
-
-                cartItem.index === index
-
-        );
-
-
-    if (!item) {
-
-        return;
-    }
-
-
-    item.quantity += change;
-
-
-    if (item.quantity <= 0) {
-
-        cart =
-
-            cart.filter(
-
-                cartItem =>
-
-                    cartItem.index !== index
-
-            );
-
-    }
-
-
-    renderCart();
-
-    updateMobileCartCount();
-}
-
-
-window.updateQuantity = updateQuantity;
-
-
-// ============================================
-// REMOVE ITEM
-// ============================================
-
-function removeFromCart(index) {
-
-    cart =
-
-        cart.filter(
-
-            item => item.index !== index
-
-        );
-
-
-    renderCart();
-
-    updateMobileCartCount();
-}
-
-
-window.removeFromCart = removeFromCart;
-
-
-// ============================================
-// CLEAR CART
-// ============================================
-
-function clearCart() {
-
-    if (cart.length === 0) {
-
-        return;
-    }
-
-
-    const confirmed = confirm(
-
-        "Clear all items from the order?"
-
-    );
-
-
-    if (!confirmed) {
-
-        return;
-    }
-
-
-    cart = [];
-
-
-    renderCart();
-
-    updateMobileCartCount();
-}
-
-
-window.clearCart = clearCart;
-
-
-// ============================================
-// CART TOTAL
-// ============================================
-
-function getCartTotal() {
-
-    return cart.reduce(
-
-        (total, item) =>
-
-            total +
-
-            (
-                item.price *
-                item.quantity
-            ),
-
-        0
-
-    );
-}
-
-
-// ============================================
-// UPDATE MOBILE CART COUNT
-// ============================================
-
-function updateMobileCartCount() {
-
-    const countElement =
-
-        document.getElementById(
-            "mobile-cart-count"
-        );
-
-
-    if (!countElement) {
-
-        return;
-    }
-
-
-    const totalItems =
-
-        cart.reduce(
-
-            (total, item) =>
-
-                total + item.quantity,
-
-            0
-
-        );
-
-
-    countElement.textContent = totalItems;
-}
-
-
-// ============================================
-// RENDER CART
-// ============================================
-
-function renderCart() {
-
-    const container =
-
-        document.getElementById(
-            "cart-items"
-        );
-
-
-    const totalElement =
-
-        document.getElementById(
-            "cart-total-price"
-        );
-
-
-    const orderButton =
-
-        document.getElementById(
-            "place-order-button"
-        );
-
-
-    if (!container) {
-
-        console.warn(
-            "Cart container not found"
-        );
-
-        return;
-    }
-
-
-    const total = getCartTotal();
-
-
-    // ----------------------------------------
-    // UPDATE TOTAL
-    // ----------------------------------------
-
-    if (totalElement) {
-
-        totalElement.textContent =
-
-            `OMR ${total.toFixed(3)}`;
-
-    }
-
-
-    // ----------------------------------------
-    // ENABLE/DISABLE BUTTON
-    // ----------------------------------------
-
-    if (orderButton) {
-
-        orderButton.disabled =
-
-            cart.length === 0;
-
-    }
-
-
-    // ----------------------------------------
-    // EMPTY CART
-    // ----------------------------------------
-
-    if (cart.length === 0) {
-
-        container.innerHTML = `
-
-            <div class="empty-order">
-
-                <div>
-                    🛒
-                </div>
-
-                <p>
-                    Your order is empty
-                </p>
-
-            </div>
-
-        `;
-
-
-        return;
-    }
-
-
-    // ----------------------------------------
-    // CART ITEMS
-    // ----------------------------------------
-
-    container.innerHTML =
-
-        cart.map(item => {
-
-
-            const itemTotal =
-
-                item.price *
-                item.quantity;
-
-
-            return `
-
-                <div class="cart-item">
-
-
-                    <div class="cart-item-main">
-
-
-                        <div class="cart-item-name">
-
-                            ${escapeHTML(item.name)}
-
-                        </div>
-
-
-                        <div class="cart-item-price">
-
-                            OMR ${itemTotal.toFixed(3)}
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <div class="cart-controls">
-
-
-                        <button
-
-                            type="button"
-
-                            class="cart-control"
-
-                            onclick="updateQuantity(${item.index}, -1)"
-
-                        >
-
-                            −
-
-                        </button>
-
-
-
-                        <span class="cart-quantity">
-
-                            ${item.quantity}
-
-                        </span>
-
-
-
-                        <button
-
-                            type="button"
-
-                            class="cart-control"
-
-                            onclick="updateQuantity(${item.index}, 1)"
-
-                        >
-
-                            +
-
-                        </button>
-
-
-
-                        <button
-
-                            type="button"
-
-                            class="remove-item"
-
-                            onclick="removeFromCart(${item.index})"
-
-                        >
-
-                            Remove
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-            `;
-
-
-        }).join("");
-
-}
-
-
-// ============================================
-// MOBILE CART
-// ============================================
-
-function toggleMobileCart() {
-
-    const orderPanel =
-
-        document.getElementById(
-            "order-panel"
-        );
-
-
-    const overlay =
-
-        document.getElementById(
-            "mobile-overlay"
-        );
-
-
-    if (!orderPanel || !overlay) {
-
-        console.warn(
-            "Mobile cart elements not found"
-        );
-
-        return;
-    }
-
-
-    const isOpen =
-
-        orderPanel.classList.contains(
-            "mobile-active"
-        );
-
-
-    if (isOpen) {
-
-        orderPanel.classList.remove(
-            "mobile-active"
-        );
-
-        overlay.classList.remove(
-            "active"
-        );
-
-    }
-
-    else {
-
-        orderPanel.classList.add(
-            "mobile-active"
-        );
-
-        overlay.classList.add(
-            "active"
-        );
-
-    }
-
-}
-
-
-window.toggleMobileCart =
-    toggleMobileCart;
-
-
-// ============================================
-// SUBMIT ORDER
-// ============================================
-
-async function submitOrder() {
-
-    if (cart.length === 0) {
-
-        alert(
-            "Please add at least one item."
-        );
-
-        return;
-    }
-
-
-    const tableNumber =
-
-        document
-            .getElementById(
-                "table-number"
-            )
-            ?.value
-            .trim() || "Walk-in";
-
-
-    const customerName =
-
-        document
-            .getElementById(
-                "customer-name"
-            )
-            ?.value
-            .trim();
-
-
-    const customerPhone =
-
-        document
-            .getElementById(
-                "customer-phone"
-            )
-            ?.value
-            .trim();
-
-
-    const instructions =
-
-        document
-            .getElementById(
-                "customer-instructions"
-            )
-            ?.value
-            .trim();
-
-
-    const paymentMethod =
-
-        document.querySelector(
-
-            'input[name="payment"]:checked'
-
-        )?.value ||
-
-        "Pay at Counter";
-
-
-    // ----------------------------------------
-    // VALIDATE NAME
-    // ----------------------------------------
-
-    if (!customerName) {
-
-        alert(
-            "Please enter your name."
-        );
-
-
-        document
-            .getElementById(
-                "customer-name"
-            )
-            ?.focus();
-
-
-        return;
-    }
-
-
-    const orderButton =
-
-        document.getElementById(
-            "place-order-button"
-        );
-
-
-    if (!orderButton) {
-
-        console.error(
-            "Place order button not found"
-        );
-
-        return;
-    }
-
-
-    const originalText =
-
-        orderButton.textContent;
-
-
-    orderButton.disabled = true;
-
-    orderButton.textContent =
-        "PLACING ORDER...";
-
-
-    const orderData = {
-
-
-        table_number:
-            tableNumber,
-
-
-        customer_name:
-            customerName,
-
-
-        customer_phone:
-            customerPhone,
-
-
-        instructions:
-            instructions,
-
-
-        payment_method:
-            paymentMethod,
-
-
-        items:
-
-            cart.map(item => ({
-
-                name:
-                    item.name,
-
-
-                price:
-                    item.price,
-
-
-                quantity:
-                    item.quantity
-
-            })),
-
-
-        total:
-            getCartTotal()
-
-    };
-
-
-    try {
-
-
-        const response =
-
-            await fetch(
-
-                "/place-order",
-
-                {
-
-                    method: "POST",
-
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-
-                    body:
-
-                        JSON.stringify(
-                            orderData
-                        )
-
-                }
-
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-
-                data.message ||
-                "Order failed"
-
-            );
-
-        }
-
-
-        if (!data.success) {
-
-            throw new Error(
-
-                data.message ||
-                "Order failed"
-
-            );
-
-        }
-
-
-        alert(
-
-            `Order placed successfully!
-
-Order ID: ${data.order_id}`
-
-        );
-
-
-        // CLEAR CART
-
-        cart = [];
-
-
-        renderCart();
-
-        updateMobileCartCount();
-
-
-        // CLEAR FORM
-
-        const nameInput =
-
-            document.getElementById(
-                "customer-name"
-            );
-
-
-        const phoneInput =
-
-            document.getElementById(
-                "customer-phone"
-            );
-
-
-        const instructionsInput =
-
-            document.getElementById(
-                "customer-instructions"
-            );
-
-
-        if (nameInput) {
-
-            nameInput.value = "";
-
-        }
-
-
-        if (phoneInput) {
-
-            phoneInput.value = "";
-
-        }
-
-
-        if (instructionsInput) {
-
-            instructionsInput.value = "";
-
-        }
-
-
-        // CLOSE MOBILE CART
-
-        const orderPanel =
-
-            document.getElementById(
-                "order-panel"
-            );
-
-
-        const overlay =
-
-            document.getElementById(
-                "mobile-overlay"
-            );
-
-
-        orderPanel?.classList.remove(
-            "mobile-active"
-        );
-
-
-        overlay?.classList.remove(
-            "active"
-        );
-
-
-    }
-
-
-    catch (error) {
-
-
-        console.error(
-            "Order error:",
-            error
-        );
-
-
-        alert(
-
-            error.message ||
-
-            "Unable to place order. Please try again."
-
-        );
-
-    }
-
-
-    finally {
-
-
-        orderButton.disabled = false;
-
-        orderButton.textContent =
-            originalText;
-
-    }
-
-}
-
-
-window.submitOrder =
-    submitOrder;
-
-
-// ============================================
-// INITIALIZE WEBSITE
-// ============================================
-
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    () => {
-
-
-        console.log(
-            "================================"
-        );
-
-
-        console.log(
-            "AKFAA COFFEE SHOP LOADED"
-        );
-
-
-        const menuData =
-            getMenuData();
-
-
-        console.log(
-            "Total menu items:",
-            menuData.length
-        );
-
-
-        console.log(
-            "Categories:",
-            getCategories()
-        );
-
-
-        console.log(
-            "================================"
-        );
-
-
-        // RENDER MENU
-
-        renderMenu();
-
-
-        // RENDER CART
-
-        renderCart();
-
-
-        // UPDATE MOBILE COUNT
-
-        updateMobileCartCount();
-
-
-        // ORDER BUTTON
-
-        const orderButton =
-
-            document.getElementById(
-                "place-order-button"
-            );
-
-
-        if (orderButton) {
-
-            orderButton.addEventListener(
-
-                "click",
-
-                submitOrder
-
-            );
-
-        }
-
-
-    }
-
-);
-
+console.log("AKFAA MENU DATA LOADED SUCCESSFULLY");
+console.log("Total menu items:", menu.length);
 
 console.log(
-    "AKFAA script.js loaded successfully"
+    "Categories:",
+    [...new Set(menu.map(item => item.category))]
 );
