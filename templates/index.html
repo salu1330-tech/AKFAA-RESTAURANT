@@ -1,333 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>AKFAA Coffee Shop | مقهى أكفاء</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+
 </head>
+
 
 <body>
 
-    <!-- =========================
-         TOP NAVIGATION
-    ========================== -->
-    <header class="site-header">
-        <div class="nav-inner">
+    <!-- MAIN APPLICATION -->
 
-            <a href="#" class="brand" aria-label="AKFAA Coffee Shop home">
-                <span class="brand-mark">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}"
-                         alt="AKFAA"
-                         onerror="this.style.display='none';">
-                    <span class="brand-fallback">A</span>
-                </span>
-
-                <span class="brand-copy">
-                    <strong>AKFAA</strong>
-                    <small>Coffee Shop</small>
-                </span>
-            </a>
-
-            <nav class="desktop-nav" aria-label="Main navigation">
-                <a href="#home">Home</a>
-                <a href="#menu">Menu</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
-            </nav>
-
-            <button type="button"
-                    class="cart-trigger"
-                    onclick="toggleCart()"
-                    aria-label="Open order cart">
-                <span class="cart-icon">🛒</span>
-                <span class="cart-label">Order</span>
-                <span class="cart-badge" id="cart-count">0</span>
-            </button>
-
-        </div>
-    </header>
+    <main class="restaurant-app">
 
 
-    <!-- =========================
-         MAIN CONTENT & SECTIONS
-    ========================== -->
-    <main>
+        <!-- LEFT SIDE -->
 
-        <section class="hero" id="home">
-            <div class="hero-content">
-                <span class="eyebrow">
-                    WADI KABIR · MUSCAT
-                </span>
-
-                <h1>
-                    Good food.<br>
-                    <em>Good mood.</em>
-                </h1>
-
-                <p>
-                    Fresh flavours, great coffee and satisfying meals —
-                    prepared for you at AKFAA Coffee Shop.
-                </p>
-
-                <div class="hero-actions">
-                    <a href="#menu" class="primary-btn">
-                        Explore Menu
-                    </a>
-
-                    <a href="#contact" class="secondary-btn">
-                        Find Us
-                    </a>
-                </div>
-            </div>
-
-            <div class="hero-decoration" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </section>
+        <section class="menu-area">
 
 
-        <!-- QUICK INFO -->
-        <section class="quick-info" aria-label="Restaurant information">
-            <div class="info-item">
-                <span class="info-icon">☕</span>
-                <div>
-                    <strong>Fresh Coffee</strong>
-                    <small>Hot & freshly prepared</small>
-                </div>
-            </div>
+            <!-- HEADER -->
 
-            <div class="info-divider"></div>
+            <header class="menu-header">
 
-            <div class="info-item">
-                <span class="info-icon">🍔</span>
-                <div>
-                    <strong>Fresh Food</strong>
-                    <small>Made to order</small>
-                </div>
-            </div>
+                <div class="brand">
 
-            <div class="info-divider"></div>
+                    <img
+                        src="{{ url_for('static', filename='images/logo.png') }}"
+                        alt="AKFAA Coffee Shop"
+                        class="logo">
 
-            <div class="info-item">
-                <span class="info-icon">📍</span>
-                <div>
-                    <strong>Wadi Kabir</strong>
-                    <small>Muscat, Oman</small>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ABOUT -->
-        <section class="about-section section-shell" id="about">
-            <div class="section-kicker">WELCOME TO AKFAA</div>
-
-            <div class="about-grid">
-                <div>
-                    <h2>
-                        A simple place for
-                        <span>good food.</span>
-                    </h2>
-                </div>
-
-                <div class="about-copy">
-                    <p>
-                        AKFAA Coffee Shop is located in Wadi Kabir, Muscat,
-                        Oman. Enjoy burgers, sandwiches, breakfast, shakes,
-                        mojitos, juices and coffee in a relaxed atmosphere.
-                    </p>
-
-                    <a href="#menu" class="text-link">
-                        Browse our menu <span>→</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- MENU -->
-        <section class="menu-section" id="menu">
-            <div class="section-shell">
-                <div class="menu-heading">
                     <div>
-                        <div class="section-kicker">WHAT WE SERVE</div>
-                        <h2>Our Menu</h2>
+
+                        <h1>
+                            AKFAA Coffee Shop
+                        </h1>
+
+                        <p>
+                            أكفاء للأعمال والتطوير
+                        </p>
+
                     </div>
 
-                    <p>
-                        Choose your favourite and add it to your order.
-                    </p>
                 </div>
 
-                <!-- CATEGORY FILTERS -->
-                <div class="category-nav"
-                     id="category-nav"
-                     role="tablist"
-                     aria-label="Menu categories">
-                    <!-- JavaScript inserts category buttons dynamically -->
-                </div>
 
-                <!-- MENU ITEMS -->
-                <div class="menu-grid" id="menu-container">
-                    <!-- JavaScript inserts menu cards dynamically -->
-                </div>
+                <button
+                    type="button"
+                    class="mobile-cart-button"
+                    onclick="toggleMobileCart()">
+
+                    🛒
+                    <span id="mobile-cart-count">
+                        0
+                    </span>
+
+                </button>
+
+            </header>
+
+
+            <!-- MENU -->
+
+            <div
+                id="menu-container"
+                class="menu-categories">
+
+                <!-- JavaScript creates categories -->
+
             </div>
+
+
         </section>
 
 
-        <!-- CONTACT -->
-        <section class="contact-section section-shell" id="contact">
-            <div class="contact-card">
-                <div class="contact-main">
-                    <div class="section-kicker">COME VISIT US</div>
+        <!-- RIGHT ORDER PANEL -->
 
-                    <h2>
-                        See you at<br>
-                        <span>AKFAA.</span>
-                    </h2>
+        <aside
+            class="order-panel"
+            id="order-panel">
 
-                    <p>
-                        Wadi Kabir, Muscat, Oman
-                    </p>
-                </div>
 
-                <div class="contact-details">
-                    <a href="tel:92761897">
-                        <span>Phone</span>
-                        <strong>92761897</strong>
-                    </a>
+            <!-- ORDER HEADER -->
 
-                    <a href="tel:93079614">
-                        <span>WhatsApp</span>
-                        <strong>93079614</strong>
-                    </a>
-                </div>
+            <div class="order-header">
+
+                <h2>
+                    Your Order
+                </h2>
+
+                <button
+                    type="button"
+                    class="close-mobile-cart"
+                    onclick="toggleMobileCart()">
+
+                    ×
+
+                </button>
+
             </div>
-        </section>
+
+
+            <!-- CART ITEMS -->
+
+            <div
+                id="cart-items"
+                class="order-items">
+
+            </div>
+
+
+            <!-- CHECKOUT -->
+
+            <div class="checkout-section">
+
+
+                <div class="total-row">
+
+                    <span>
+                        Total:
+                    </span>
+
+                    <strong id="cart-total-price">
+
+                        OMR 0.000
+
+                    </strong>
+
+                </div>
+
+
+                <!-- TABLE -->
+
+                <div class="form-field">
+
+                    <label for="table-number">
+
+                        Table Number:
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="table-number"
+                        value="{{ table_no }}"
+                        readonly>
+
+                </div>
+
+
+                <!-- CUSTOMER NAME -->
+
+                <div class="form-field">
+
+                    <label for="customer-name">
+
+                        Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customer-name"
+                        placeholder="Enter your name">
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="form-field">
+
+                    <label for="customer-phone">
+
+                        Phone
+
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="customer-phone"
+                        placeholder="Enter phone number">
+
+                </div>
+
+
+                <!-- SPECIAL -->
+
+                <div class="form-field">
+
+                    <label for="customer-instructions">
+
+                        Special Instructions
+
+                    </label>
+
+                    <textarea
+                        id="customer-instructions"
+                        placeholder="Any special request?"></textarea>
+
+                </div>
+
+
+                <!-- PAYMENT -->
+
+                <div class="payment-section">
+
+                    <label>
+                        Payment Method
+                    </label>
+
+                    <div class="payment-options">
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="payment"
+                                value="Pay at Counter"
+                                checked>
+
+                            Pay at Counter
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="payment"
+                                value="Cash">
+
+                            Cash
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PLACE ORDER -->
+
+                <button
+                    type="button"
+                    id="place-order-button"
+                    class="place-order-btn">
+
+                    PLACE ORDER
+
+                </button>
+
+
+            </div>
+
+
+        </aside>
+
 
     </main>
 
 
-    <!-- =========================
-         CART OVERLAY & SIDEBAR
-    ========================== -->
-    <div class="cart-overlay"
-         id="cart-overlay"
-         onclick="toggleCart()"></div>
+    <!-- MOBILE OVERLAY -->
 
-    <aside class="cart-sidebar"
-           id="cart-sidebar"
-           aria-label="Your order"
-           aria-hidden="true">
+    <div
+        class="mobile-overlay"
+        id="mobile-overlay"
+        onclick="toggleMobileCart()">
 
-        <div class="cart-header">
-            <div>
-                <span class="cart-kicker">YOUR ORDER</span>
-                <h2>Your Cart</h2>
-            </div>
-
-            <button type="button"
-                    class="close-cart"
-                    onclick="toggleCart()"
-                    aria-label="Close cart">
-                ×
-            </button>
-        </div>
-
-        <!-- CART ITEMS -->
-        <div class="cart-items" id="cart-items">
-            <!-- JavaScript inserts cart items dynamically -->
-        </div>
-
-        <!-- CHECKOUT -->
-        <div class="checkout-panel">
-            <div class="checkout-title">
-                <span>Order details</span>
-            </div>
-
-            <div class="form-grid">
-                <div class="field">
-                    <label for="table-number">Table</label>
-                    <input type="text"
-                           id="table-number"
-                           value="{{ table_no }}"
-                           readonly>
-                </div>
-
-                <div class="field field-wide">
-                    <label for="customer-name">Your Name</label>
-                    <input type="text"
-                           id="customer-name"
-                           placeholder="Enter your name"
-                           maxlength="100"
-                           autocomplete="name">
-                </div>
-
-                <div class="field field-wide">
-                    <label for="customer-phone">Phone Number</label>
-                    <input type="tel"
-                           id="customer-phone"
-                           placeholder="Enter phone number"
-                           maxlength="20"
-                           autocomplete="tel">
-                </div>
-
-                <div class="field field-wide">
-                    <label for="customer-instructions">
-                        Special Instructions
-                    </label>
-                    <textarea id="customer-instructions"
-                              placeholder="Example: No onions, extra spicy"
-                              maxlength="500"></textarea>
-                </div>
-
-                <div class="field field-wide">
-                    <label>Payment</label>
-                    <label class="payment-choice">
-                        <input type="radio"
-                               name="payment"
-                               value="Pay at Counter"
-                               checked>
-                        <span>
-                            <strong>Pay at Counter</strong>
-                            <small>Pay when your order is served</small>
-                        </span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- TOTAL + ORDER -->
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total</span>
-                <strong id="cart-total-price">OMR 0.000</strong>
-            </div>
-
-            <button type="button"
-                    id="place-order-button"
-                    class="place-order-btn">
-                <span>Place Order</span>
-                <span>→</span>
-            </button>
-        </div>
-
-    </aside>
+    </div>
 
 
-    <!-- =========================
-         JAVASCRIPT
-    ========================== -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- MENU DATA -->
+
+    <script
+        src="{{ url_for('static', filename='js/menu-data.js') }}">
+    </script>
+
+
+    <!-- WEBSITE LOGIC -->
+
+    <script
+        src="{{ url_for('static', filename='js/script.js') }}">
+    </script>
+
+
+</body>
+
+</html><script src="{{ url_for('static', filename='js/menu-data.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 </html>
