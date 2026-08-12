@@ -56,6 +56,9 @@
             border-bottom: 2px solid var(--gold);
             padding: 25px 20px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
 
@@ -76,6 +79,70 @@
         .admin-header p {
             margin: 8px 0 0;
             color: #cccccc;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            width: 10px;
+            height: 10px;
+            background: #27ae60;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+
+        /* =========================================
+           FILTER TABS
+           ========================================= */
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 15px 20px;
+            flex-wrap: wrap;
+            background: var(--header-green);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .filter-tab.active {
+            background: var(--gold);
+            color: #111;
+            border-color: var(--gold);
+        }
+
+        .order-count {
+            font-size: 11px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        .filter-tab.active .order-count {
+            background: rgba(0,0,0,0.2);
         }
 
 
@@ -123,6 +190,12 @@
             box-shadow:
                 0 8px 25px
                 rgba(0, 0, 0, 0.25);
+            transition: 0.3s ease;
+        }
+
+        .order.updating {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
 
@@ -130,22 +203,22 @@
            STATUS CARD COLORS
            ========================================= */
 
-        .new {
+        .order.new {
             border-left-color: var(--new);
         }
 
 
-        .preparing {
+        .order.preparing {
             border-left-color: var(--preparing);
         }
 
 
-        .ready {
+        .order.ready {
             border-left-color: var(--ready);
         }
 
 
-        .completed {
+        .order.completed {
             border-left-color: var(--completed);
             opacity: 0.85;
         }
@@ -309,21 +382,14 @@
 
         .actions {
             display: grid;
-
             grid-template-columns:
-                repeat(3, 1fr);
-
+                repeat(auto-fit, minmax(100px, 1fr));
             gap: 8px;
             margin-top: 20px;
         }
 
 
-        .actions form {
-            margin: 0;
-        }
-
-
-        button {
+        .actions button {
             width: 100%;
             border: none;
             padding: 12px 8px;
@@ -335,7 +401,7 @@
         }
 
 
-        button:hover {
+        .actions button:hover {
             transform: translateY(-2px);
             opacity: 0.9;
         }
@@ -356,6 +422,43 @@
         .complete-btn {
             background: var(--completed);
             color: white;
+        }
+
+        .delete-btn {
+            background: #c0392b;
+            color: white;
+        }
+
+
+        /* =========================================
+           TOAST NOTIFICATION
+           ========================================= */
+
+        .admin-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--card-green);
+            border: 1px solid var(--gold);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .admin-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .admin-toast.error {
+            border-color: var(--new);
         }
 
 
@@ -404,6 +507,12 @@
                 flex-direction: column;
             }
 
+            .admin-toast {
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+            }
+
         }
 
     </style>
@@ -422,6 +531,7 @@
 
         <h1>
             ☕ AKFAA Coffee Shop
+            <span class="live-indicator"></span>
         </h1>
 
 
@@ -434,11 +544,34 @@
 
         <p>
 
-            Order Management Dashboard
+            Order Management Dashboard (Live)
 
         </p>
 
     </header>
+
+
+    <!-- =========================================
+         FILTER TABS
+         ========================================= -->
+
+    <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-filter="ALL">
+            All
+        </button>
+        <button class="filter-tab" data-filter="NEW">
+            New
+        </button>
+        <button class="filter-tab" data-filter="PREPARING">
+            Preparing
+        </button>
+        <button class="filter-tab" data-filter="READY">
+            Ready
+        </button>
+        <button class="filter-tab" data-filter="COMPLETED">
+            Completed
+        </button>
+    </div>
 
 
     <!-- =========================================
@@ -448,399 +581,380 @@
     <main class="dashboard">
 
 
-        <h2 class="dashboard-title">
+        <h2 class="dashboard-title" id="dashboard-title">
 
             📋 Current Orders
 
         </h2>
 
 
-        <div class="orders">
-
-
-            {% if orders_data %}
-
-
-                {% for entry in orders_data %}
-
-
-                    <div
-                        class="order
-                        {% if entry['order']['status'] == 'NEW' %}
-                            new
-                        {% elif entry['order']['status'] == 'PREPARING' %}
-                            preparing
-                        {% elif entry['order']['status'] == 'READY' %}
-                            ready
-                        {% elif entry['order']['status'] == 'COMPLETED' %}
-                            completed
-                        {% endif %}
-                        "
-                    >
-
-
-                        <!-- ORDER HEADER -->
-
-                        <div class="order-top">
-
-
-                            <h2 class="order-number">
-
-                                Order
-                                #{{ entry["order"]["id"] }}
-
-                            </h2>
-
-
-                            {% if entry["order"]["status"] == "NEW" %}
-
-                                <span
-                                    class="status status-new"
-                                >
-
-                                    NEW
-
-                                </span>
-
-
-                            {% elif entry["order"]["status"] == "PREPARING" %}
-
-                                <span
-                                    class="status status-preparing"
-                                >
-
-                                    PREPARING
-
-                                </span>
-
-
-                            {% elif entry["order"]["status"] == "READY" %}
-
-                                <span
-                                    class="status status-ready"
-                                >
-
-                                    READY
-
-                                </span>
-
-
-                            {% elif entry["order"]["status"] == "COMPLETED" %}
-
-                                <span
-                                    class="status status-completed"
-                                >
-
-                                    COMPLETED
-
-                                </span>
-
-
-                            {% else %}
-
-                                <span class="status">
-
-                                    {{ entry["order"]["status"] }}
-
-                                </span>
-
-                            {% endif %}
-
-
-                        </div>
-
-
-                        <!-- =========================================
-                             CUSTOMER INFORMATION
-                             ========================================= -->
-
-                        <div class="order-info">
-
-
-                            <p>
-
-                                <b>
-                                    🪑 Table:
-                                </b>
-
-                                {{ entry["order"]["table_no"] }}
-
-                            </p>
-
-
-                            <p>
-
-                                <b>
-                                    👤 Customer:
-                                </b>
-
-                                {{ entry["order"]["customer_name"] }}
-
-                            </p>
-
-
-                            <p>
-
-                                <b>
-                                    📞 Phone:
-                                </b>
-
-                                {{ entry["order"]["phone"] }}
-
-                            </p>
-
-
-                            <p>
-
-                                <b>
-                                    💳 Payment:
-                                </b>
-
-                                {{ entry["order"]["payment_method"] }}
-
-                            </p>
-
-
-                            <p>
-
-                                <b>
-                                    🕒 Ordered:
-                                </b>
-
-                                {{ entry["order"]["created_at"] }}
-
-                            </p>
-
-
-                        </div>
-
-
-                        <!-- =========================================
-                             ORDER ITEMS
-                             ========================================= -->
-
-                        <h3 class="items-title">
-
-                            🍽️ Items
-
-                        </h3>
-
-
-                        <ul class="items-list">
-
-
-                            {% for item in entry["items"] %}
-
-
-                                <li>
-
-
-                                    <span class="item-name">
-
-                                        {{ item["item_name"] }}
-
-                                        ×
-
-                                        {{ item["quantity"] }}
-
-                                    </span>
-
-
-                                    <span class="item-price">
-
-                                        OMR
-
-                                        {{ "%.3f"|format(
-                                            item["price"]
-                                            *
-                                            item["quantity"]
-                                        ) }}
-
-                                    </span>
-
-
-                                </li>
-
-
-                            {% endfor %}
-
-
-                        </ul>
-
-
-                        <!-- =========================================
-                             TOTAL
-                             ========================================= -->
-
-                        <div class="total">
-
-                            Total:
-
-                            OMR
-
-                            {{ "%.3f"|format(
-                                entry["order"]["total"]
-                            ) }}
-
-                        </div>
-
-
-                        <!-- =========================================
-                             CUSTOMER NOTE
-                             ========================================= -->
-
-                        {% if entry["order"]["instructions"] %}
-
-
-                            <div class="note">
-
-                                📝
-
-                                <b>
-                                    Customer Note:
-                                </b>
-
-                                {{ entry["order"]["instructions"] }}
-
-                            </div>
-
-
-                        {% endif %}
-
-
-                        <!-- =========================================
-                             STATUS ACTIONS
-                             ========================================= -->
-
-                        {% if entry["order"]["status"] != "COMPLETED" %}
-
-
-                            <div class="actions">
-
-
-                                {% if entry["order"]["status"] != "PREPARING" %}
-
-
-                                    <form
-                                        action="{{ url_for(
-                                            'update_status',
-                                            order_id=entry['order']['id'],
-                                            status='PREPARING'
-                                        ) }}"
-                                        method="POST"
-                                    >
-
-
-                                        <button
-                                            type="submit"
-                                            class="preparing-btn"
-                                        >
-
-                                            👨‍🍳 Preparing
-
-                                        </button>
-
-
-                                    </form>
-
-
-                                {% endif %}
-
-
-                                {% if entry["order"]["status"] != "READY" %}
-
-
-                                    <form
-                                        action="{{ url_for(
-                                            'update_status',
-                                            order_id=entry['order']['id'],
-                                            status='READY'
-                                        ) }}"
-                                        method="POST"
-                                    >
-
-
-                                        <button
-                                            type="submit"
-                                            class="ready-btn"
-                                        >
-
-                                            ✅ Ready
-
-                                        </button>
-
-
-                                    </form>
-
-
-                                {% endif %}
-
-
-                                <form
-                                    action="{{ url_for(
-                                        'update_status',
-                                        order_id=entry['order']['id'],
-                                        status='COMPLETED'
-                                    ) }}"
-                                    method="POST"
-                                >
-
-
-                                    <button
-                                        type="submit"
-                                        class="complete-btn"
-                                    >
-
-                                        ✔ Completed
-
-                                    </button>
-
-
-                                </form>
-
-
-                            </div>
-
-
-                        {% endif %}
-
-
-                    </div>
-
-
-                {% endfor %}
-
-
-            {% else %}
-
-
-                <div class="no-orders">
-
-
-                    <h2>
-
-                        No orders available
-
-                    </h2>
-
-
-                    <p>
-
-                        New customer orders will appear here.
-
-                    </p>
-
-
-                </div>
-
-
-            {% endif %}
-
+        <div class="orders" id="orders-container">
+
+            <div class="no-orders">
+                <h2>Loading orders...</h2>
+                <p>Please wait.</p>
+            </div>
 
         </div>
 
 
     </main>
+
+
+    <!-- =========================================
+         ADMIN JAVASCRIPT
+         ========================================= -->
+
+    <script>
+
+        // =============================================
+        // STATE
+        // =============================================
+
+        let allOrders = [];
+        let activeFilter = "ALL";
+        let refreshInterval = null;
+
+
+        // =============================================
+        // INITIALIZE
+        // =============================================
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setupFilterTabs();
+            fetchOrders();
+
+            // Auto-refresh every 5 seconds
+            refreshInterval = setInterval(fetchOrders, 5000);
+        });
+
+
+        // =============================================
+        // FILTER TABS
+        // =============================================
+
+        function setupFilterTabs() {
+            const tabs = document.querySelectorAll(".filter-tab");
+
+            tabs.forEach(function(tab) {
+                tab.addEventListener("click", function() {
+                    activeFilter = this.dataset.filter;
+
+                    tabs.forEach(function(t) {
+                        t.classList.remove("active");
+                    });
+
+                    this.classList.add("active");
+                    renderOrders();
+                });
+            });
+        }
+
+
+        // =============================================
+        // FETCH ORDERS FROM API
+        // =============================================
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch("/api/orders");
+                const data = await response.json();
+
+                if (data.success) {
+                    allOrders = data.orders;
+                    renderOrders();
+                    updateFilterCounts();
+                }
+            } catch (error) {
+                console.error("Failed to fetch orders:", error);
+            }
+        }
+
+
+        // =============================================
+        // UPDATE FILTER COUNTS
+        // =============================================
+
+        function updateFilterCounts() {
+            const counts = {
+                ALL: allOrders.length,
+                NEW: 0,
+                PREPARING: 0,
+                READY: 0,
+                COMPLETED: 0
+            };
+
+            allOrders.forEach(function(order) {
+                if (counts[order.status] !== undefined) {
+                    counts[order.status]++;
+                }
+            });
+
+            const tabs = document.querySelectorAll(".filter-tab");
+            tabs.forEach(function(tab) {
+                const filter = tab.dataset.filter;
+                const count = counts[filter] || 0;
+                const countSpan = tab.querySelector(".order-count");
+
+                if (countSpan) {
+                    countSpan.textContent = count;
+                } else {
+                    const span = document.createElement("span");
+                    span.className = "order-count";
+                    span.textContent = count;
+                    tab.appendChild(span);
+                }
+            });
+        }
+
+
+        // =============================================
+        // RENDER ORDERS
+        // =============================================
+
+        function renderOrders() {
+            const container = document.getElementById("orders-container");
+
+            const filtered = activeFilter === "ALL"
+                ? allOrders
+                : allOrders.filter(function(o) { return o.status === activeFilter; });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="no-orders">
+                        <h2>No ${activeFilter === "ALL" ? "" : activeFilter.toLowerCase()} orders</h2>
+                        <p>New customer orders will appear here automatically.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(function(order) {
+                return renderOrderCard(order);
+            }).join("");
+
+            // Attach button events
+            attachStatusButtons();
+        }
+
+
+        // =============================================
+        // RENDER SINGLE ORDER CARD
+        // =============================================
+
+        function renderOrderCard(order) {
+            const statusClass = order.status.toLowerCase();
+
+            const statusBadge = `<span class="status status-${statusClass}">${order.status}</span>`;
+
+            const itemsHTML = order.items.map(function(item) {
+                const lineTotal = (item.price * item.quantity).toFixed(3);
+                return `
+                    <li>
+                        <span class="item-name">
+                            ${escapeHTML(item.item_name)} &times; ${item.quantity}
+                        </span>
+                        <span class="item-price">
+                            OMR ${lineTotal}
+                        </span>
+                    </li>
+                `;
+            }).join("");
+
+            const noteHTML = order.instructions
+                ? `<div class="note">📝 <b>Customer Note:</b> ${escapeHTML(order.instructions)}</div>`
+                : "";
+
+            let actionsHTML = "";
+
+            if (order.status !== "COMPLETED") {
+                let buttons = "";
+
+                if (order.status !== "PREPARING") {
+                    buttons += `
+                        <button class="preparing-btn" data-order="${order.id}" data-status="PREPARING">
+                            👨‍🍳 Preparing
+                        </button>
+                    `;
+                }
+
+                if (order.status !== "READY") {
+                    buttons += `
+                        <button class="ready-btn" data-order="${order.id}" data-status="READY">
+                            ✅ Ready
+                        </button>
+                    `;
+                }
+
+                buttons += `
+                    <button class="complete-btn" data-order="${order.id}" data-status="COMPLETED">
+                        ✔ Completed
+                    </button>
+                `;
+
+                buttons += `
+                    <button class="delete-btn" data-order="${order.id}" data-action="delete">
+                        🗑 Delete
+                    </button>
+                `;
+
+                actionsHTML = `<div class="actions">${buttons}</div>`;
+            }
+
+            return `
+                <div class="order ${statusClass}" id="order-card-${order.id}">
+
+                    <div class="order-top">
+                        <h2 class="order-number">Order #${order.id}</h2>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="order-info">
+                        <p><b>🪑 Table:</b> ${escapeHTML(order.table_number)}</p>
+                        <p><b>👤 Customer:</b> ${escapeHTML(order.customer_name)}</p>
+                        <p><b>📞 Phone:</b> ${escapeHTML(order.customer_phone)}</p>
+                        <p><b>💳 Payment:</b> ${escapeHTML(order.payment_method)}</p>
+                        ${order.address ? '<p><b>📍 Address:</b> ' + escapeHTML(order.address) + '</p>' : ''}
+                        ${order.map_link ? '<p><b>🗺️ Map:</b> <a href="' + escapeHTML(order.map_link) + '" target="_blank" rel="noopener" style="color:#4285F4;text-decoration:underline;">Open Location</a></p>' : ''}
+                        <p><b>🕒 Ordered:</b> ${escapeHTML(order.created_at)}</p>
+                    </div>
+
+                    <h3 class="items-title">🍽️ Items</h3>
+
+                    <ul class="items-list">
+                        ${itemsHTML}
+                    </ul>
+
+                    <div class="total">
+                        Total: OMR ${order.total.toFixed(3)}
+                    </div>
+
+                    ${noteHTML}
+
+                    ${actionsHTML}
+
+                </div>
+            `;
+        }
+
+
+        // =============================================
+        // ATTACH STATUS BUTTONS
+        // =============================================
+
+        function attachStatusButtons() {
+            // Status update buttons
+            const statusBtns = document.querySelectorAll("[data-status]");
+            statusBtns.forEach(function(btn) {
+                btn.addEventListener("click", function() {
+                    const orderId = this.dataset.order;
+                    const status = this.dataset.status;
+                    updateOrderStatus(orderId, status);
+                });
+            });
+
+            // Delete buttons
+            const deleteBtns = document.querySelectorAll("[data-action='delete']");
+            deleteBtns.forEach(function(btn) {
+                btn.addEventListener("click", function() {
+                    const orderId = this.dataset.order;
+                    if (confirm("Delete order #" + orderId + "?")) {
+                        deleteOrder(orderId);
+                    }
+                });
+            });
+        }
+
+
+        // =============================================
+        // UPDATE ORDER STATUS (AJAX)
+        // =============================================
+
+        async function updateOrderStatus(orderId, status) {
+            const card = document.getElementById("order-card-" + orderId);
+            if (card) card.classList.add("updating");
+
+            try {
+                const response = await fetch(
+                    "/update-status/" + orderId + "/" + status,
+                    { method: "POST" }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast("Order #" + orderId + " → " + status);
+                    fetchOrders();
+                } else {
+                    showToast(data.message || "Failed to update", "error");
+                }
+            } catch (error) {
+                showToast("Network error", "error");
+            }
+
+            if (card) card.classList.remove("updating");
+        }
+
+
+        // =============================================
+        // DELETE ORDER (AJAX)
+        // =============================================
+
+        async function deleteOrder(orderId) {
+            try {
+                const response = await fetch(
+                    "/delete-order/" + orderId,
+                    { method: "POST" }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast("Order #" + orderId + " deleted");
+                    fetchOrders();
+                } else {
+                    showToast(data.message || "Failed to delete", "error");
+                }
+            } catch (error) {
+                showToast("Network error", "error");
+            }
+        }
+
+
+        // =============================================
+        // TOAST NOTIFICATION
+        // =============================================
+
+        function showToast(message, type) {
+            const existing = document.querySelector(".admin-toast");
+            if (existing) existing.remove();
+
+            const toast = document.createElement("div");
+            toast.className = "admin-toast" + (type === "error" ? " error" : "");
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(function() { toast.classList.add("show"); }, 10);
+
+            setTimeout(function() {
+                toast.classList.remove("show");
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+
+        // =============================================
+        // ESCAPE HTML
+        // =============================================
+
+        function escapeHTML(str) {
+            if (!str) return "";
+            const div = document.createElement("div");
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+    </script>
 
 
 </body>

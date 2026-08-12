@@ -103,6 +103,19 @@
             </div>
 
 
+            <!-- LANGUAGE TOGGLE -->
+
+            <button
+                type="button"
+                class="lang-toggle-btn"
+                id="lang-toggle"
+                onclick="toggleLanguage()"
+                aria-label="Switch language"
+            >
+                عربي
+            </button>
+
+
             <!-- CART BUTTON -->
 
             <button
@@ -170,6 +183,15 @@
                 autocomplete="off"
             >
 
+            <button
+                type="button"
+                class="reviews-btn"
+                id="open-reviews-btn"
+                onclick="openReviewsModal()"
+            >
+                ⭐ Reviews
+            </button>
+
         </div>
 
 
@@ -206,158 +228,53 @@
              MOVED TO BOTTOM
              ===================================== -->
 
-        <section class="business-info">
+        <section class="shop-card">
 
+            <div class="shop-card-row">
 
-            <!-- ARABIC BUSINESS NAME -->
-
-            <div
-                class="business-arabic-name"
-                dir="rtl"
-            >
-                أكفاء للأعمال والتطوير
-            </div>
-
-
-            <!-- ENGLISH BUSINESS NAME -->
-
-            <div class="business-english-name">
-
-                AKFAA For Business and Development
-
-            </div>
-
-
-            <!-- COFFEE SHOP TITLE -->
-
-            <div class="coffee-shop-title">
-
-                <span>
-                    Coffee Shop
-                </span>
-
-                <span class="title-divider">
-                    |
-                </span>
-
-                <span
-                    dir="rtl"
-                >
-                    مقهى
-                </span>
-
-            </div>
-
-
-            <!-- LOCATION -->
-
-            <div class="business-location">
-
-
-                <!-- WADI KABIR -->
-
-                <div class="location-block">
-
-                    <span class="location-english">
-                        Wadi Kabir
-                    </span>
-
-                    <span
-                        class="location-arabic"
-                        dir="rtl"
+                <div class="shop-card-image">
+                    <img
+                        src="{{ url_for('static', filename='images/shop.jpg') }}"
+                        alt="AKFAA Coffee Shop"
+                        loading="lazy"
                     >
-                        وادي الكبير
-                    </span>
-
                 </div>
 
+                <div class="shop-card-body">
 
-                <!-- LOCATION ICON -->
+                    <h3 class="shop-card-title">AKFAA Coffee Shop</h3>
+                    <p class="shop-card-title-ar" dir="rtl">أكفاء للأعمال والتطوير</p>
 
-                <div
-                    class="location-pin"
-                    aria-hidden="true"
-                >
-                    📍
-                </div>
+                    <p class="shop-card-location">
+                        📍 Wadi Kabir, Muscat, Oman
+                    </p>
 
+                    <div class="shop-card-contacts">
 
-                <!-- MUSCAT -->
+                        <a href="tel:92761897" class="shop-contact-btn phone-btn">
+                            ☎ 92761897
+                        </a>
 
-                <div class="location-block">
+                        <a href="https://wa.me/96893079614" target="_blank" rel="noopener noreferrer" class="shop-contact-btn whatsapp-btn">
+                            💬 WhatsApp
+                        </a>
 
-                    <span class="location-english">
-                        Muscat, Oman
-                    </span>
+                    </div>
 
-                    <span
-                        class="location-arabic"
-                        dir="rtl"
+                    <a
+                        href="https://www.google.com/maps/place/23%C2%B035'02.2%22N+58%C2%B033'38.8%22E/@23.5839184,58.5599446,19z/data=!4m4!3m3!8m2!3d23.5839393!4d58.5607841?hl=en&entry=ttu"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="shop-card-map-link"
                     >
-                        مسقط، عمان
-                    </span>
+                        🗺️ View on Map
+                    </a>
 
                 </div>
-
 
             </div>
-
 
         </section>
-
-
-        <!-- =====================================
-             CONTACT INFORMATION
-             BOTTOM
-             ===================================== -->
-
-        <section class="contact-info">
-
-
-            <!-- PHONE -->
-
-            <a
-                href="tel:92761897"
-                class="contact-item"
-                aria-label="Call 92761897"
-            >
-
-                <span class="contact-icon">
-                    ☎
-                </span>
-
-                <span class="contact-number">
-                    92761897
-                </span>
-
-            </a>
-
-
-            <!-- DIVIDER -->
-
-            <div class="contact-divider"></div>
-
-
-            <!-- WHATSAPP -->
-
-            <a
-                href="https://wa.me/96893079614"
-                class="contact-item"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp 93079614"
-            >
-
-                <span class="contact-icon">
-                    WhatsApp
-                </span>
-
-                <span class="contact-number">
-                    93079614
-                </span>
-
-            </a>
-
 
         </section>
 
@@ -569,6 +486,43 @@
 
 
 
+        <!-- DELIVERY ADDRESS (Optional) -->
+
+        <div class="form-field">
+
+            <label for="customer-address">
+                Delivery Address (Optional)
+            </label>
+
+            <textarea
+                id="customer-address"
+                placeholder="Enter your delivery address"
+                rows="2"
+            ></textarea>
+
+        </div>
+
+
+
+        <!-- GOOGLE MAPS LINK (Optional) -->
+
+        <div class="form-field">
+
+            <label for="customer-map-link">
+                Google Maps Link (Optional)
+            </label>
+
+            <input
+                type="url"
+                id="customer-map-link"
+                placeholder="Paste your Google Maps location link"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+
         <!-- =====================================
              PAYMENT METHOD
              ===================================== -->
@@ -634,12 +588,170 @@
             PLACE ORDER
         </button>
 
+        <!-- TRACK ORDER -->
+
+        <button
+            type="button"
+            id="track-order-button"
+            class="track-order-btn"
+            style="display: none;"
+            onclick="reopenTracking()"
+        >
+            📍 Track My Order
+        </button>
+
 
     </div>
 
 
 </aside>
 
+
+
+<!-- =====================================
+     REVIEWS POPUP MODAL
+     ===================================== -->
+
+<div class="reviews-modal-overlay" id="reviews-modal-overlay"></div>
+
+<div class="reviews-modal" id="reviews-modal">
+
+    <button
+        type="button"
+        class="reviews-modal-close"
+        onclick="closeReviewsModal()"
+    >
+        &times;
+    </button>
+
+    <div class="reviews-modal-header">
+        <h2 class="reviews-title">Customer Reviews</h2>
+        <div class="reviews-avg" id="reviews-avg"></div>
+    </div>
+
+    <div class="reviews-modal-body">
+
+        <!-- REVIEWS LIST -->
+        <div class="reviews-list" id="reviews-list">
+            <p class="reviews-loading">Loading reviews...</p>
+        </div>
+
+        <!-- WRITE REVIEW -->
+        <div class="review-form-card">
+
+            <h3 class="review-form-title">Leave a Review</h3>
+
+            <div class="review-stars-input" id="review-stars-input">
+                <span class="star-input" data-star="1">★</span>
+                <span class="star-input" data-star="2">★</span>
+                <span class="star-input" data-star="3">★</span>
+                <span class="star-input" data-star="4">★</span>
+                <span class="star-input" data-star="5">★</span>
+            </div>
+
+            <input
+                type="text"
+                id="review-name"
+                class="review-input"
+                placeholder="Your name"
+                autocomplete="name"
+            >
+
+            <textarea
+                id="review-comment"
+                class="review-input review-textarea"
+                placeholder="Write your review..."
+                rows="3"
+            ></textarea>
+
+            <button
+                type="button"
+                class="review-submit-btn"
+                id="review-submit-btn"
+            >
+                Submit Review
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     ORDER TRACKING MODAL (Swiggy/Zomato Style)
+     ===================================== -->
+
+<div class="tracking-overlay" id="tracking-overlay"></div>
+
+<div class="tracking-modal" id="tracking-modal">
+
+    <button
+        type="button"
+        class="tracking-close"
+        id="tracking-close"
+        aria-label="Close tracking"
+    >
+        &times;
+    </button>
+
+    <div class="tracking-header">
+        <h2>Order Tracking</h2>
+        <span class="tracking-order-id" id="tracking-order-id">Order #--</span>
+    </div>
+
+    <div class="tracking-body">
+
+        <div class="tracking-stepper" id="tracking-stepper">
+
+            <div class="tracking-step" data-step="NEW">
+                <div class="step-circle">📝</div>
+                <div class="step-content">
+                    <h4>Order Placed</h4>
+                    <p>Your order has been received</p>
+                </div>
+            </div>
+
+            <div class="tracking-step" data-step="PREPARING">
+                <div class="step-circle">👨‍🍳</div>
+                <div class="step-content">
+                    <h4>Preparing</h4>
+                    <p>Chef is preparing your food</p>
+                </div>
+            </div>
+
+            <div class="tracking-step" data-step="READY">
+                <div class="step-circle">✅</div>
+                <div class="step-content">
+                    <h4>Ready</h4>
+                    <p>Your order is ready for pickup</p>
+                </div>
+            </div>
+
+            <div class="tracking-step" data-step="COMPLETED">
+                <div class="step-circle">🎉</div>
+                <div class="step-content">
+                    <h4>Completed</h4>
+                    <p>Order delivered. Enjoy!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tracking-status-msg" id="tracking-status-msg">
+            <span class="status-emoji" id="tracking-emoji">📝</span>
+            <p id="tracking-message">Your order has been placed</p>
+        </div>
+
+    </div>
+
+    <div class="tracking-footer">
+        <p>Status updates automatically every few seconds</p>
+        <p class="refresh-note">Powered by AKFAA Coffee Shop</p>
+    </div>
+
+</div>
 
 
 <!-- =====================================

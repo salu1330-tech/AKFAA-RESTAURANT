@@ -15,6 +15,8 @@ let activeCategory = "All";
 
 let searchQuery = "";
 
+let currentLang = "en";
+
 const ITEMS_PER_CATEGORY = 5;
 
 // Track expanded categories
@@ -119,6 +121,158 @@ function initializeApplication() {
 
     setupPlaceOrderButton();
 
+    initReviews();
+
+}
+
+
+// ============================================
+// LANGUAGE TOGGLE
+// ============================================
+
+function toggleLanguage() {
+
+    currentLang = currentLang === "en" ? "ar" : "en";
+
+    const btn = document.getElementById("lang-toggle");
+    if (btn) {
+        btn.textContent = currentLang === "en" ? "عربي" : "عربي";
+    }
+
+    // Toggle body direction
+    if (currentLang === "ar") {
+        document.body.setAttribute("dir", "rtl");
+        document.body.classList.add("arabic-mode");
+    } else {
+        document.body.setAttribute("dir", "ltr");
+        document.body.classList.remove("arabic-mode");
+    }
+
+    // Update static UI text
+    updateUILanguage();
+
+    // Re-render dynamic content
+    renderCategoryTabs();
+    renderMenu();
+    renderCart();
+}
+
+window.toggleLanguage = toggleLanguage;
+
+
+function updateUILanguage() {
+
+    const isAr = currentLang === "ar";
+
+    // Header
+    const brandH1 = document.querySelector(".brand-text h1");
+    if (brandH1) brandH1.textContent = isAr ? "مقهى أكفاء" : "AKFAA Coffee Shop";
+
+    const brandArabic = document.querySelector(".brand-arabic");
+    if (brandArabic) brandArabic.textContent = isAr ? "AKFAA Coffee Shop" : "أكفاء للأعمال والتطوير";
+
+    // Menu intro
+    const menuLabel = document.querySelector(".menu-label");
+    if (menuLabel) menuLabel.textContent = isAr ? "قائمتنا" : "OUR MENU";
+
+    const menuIntroH2 = document.querySelector(".menu-intro h2");
+    if (menuIntroH2) menuIntroH2.textContent = isAr ? "طازج ومحضر بحب" : "Freshly Made. Served With Love.";
+
+    const menuIntroP = document.querySelector(".menu-intro p");
+    if (menuIntroP) menuIntroP.textContent = isAr ? "اختر مأكولاتك ومشروباتك المفضلة" : "Choose your favorite food, drinks, shakes and fresh juices.";
+
+    // Search
+    const searchInput = document.getElementById("menu-search-input");
+    if (searchInput) searchInput.placeholder = isAr ? "ابحث عن الأكل والمشروبات..." : "Search food, drinks, burgers...";
+
+    // Cart header
+    const cartLabel = document.querySelector(".cart-heading-label");
+    if (cartLabel) cartLabel.textContent = isAr ? "سلتك" : "YOUR CART";
+
+    const cartH2 = document.querySelector(".order-header h2");
+    if (cartH2) cartH2.textContent = isAr ? "طلبك" : "Your Order";
+
+    // Cart button text
+    const cartBtnText = document.querySelector(".cart-button-text");
+    if (cartBtnText) cartBtnText.textContent = isAr ? "السلة" : "Cart";
+
+    // Form labels
+    const labels = {
+        "table-number": isAr ? "رقم الطاولة" : "Table Number",
+        "customer-name": isAr ? "الاسم" : "Name",
+        "customer-phone": isAr ? "الهاتف" : "Phone",
+        "customer-instructions": isAr ? "تعليمات خاصة" : "Special Instructions",
+        "customer-address": isAr ? "عنوان التوصيل (اختياري)" : "Delivery Address (Optional)",
+        "customer-map-link": isAr ? "رابط خرائط جوجل (اختياري)" : "Google Maps Link (Optional)"
+    };
+
+    Object.entries(labels).forEach(([id, text]) => {
+        const input = document.getElementById(id);
+        if (input) {
+            const label = input.previousElementSibling || document.querySelector(`label[for="${id}"]`);
+            if (label && label.tagName === "LABEL") label.textContent = text;
+        }
+    });
+
+    // Placeholders
+    const nameInput = document.getElementById("customer-name");
+    if (nameInput) nameInput.placeholder = isAr ? "أدخل اسمك" : "Enter your name";
+
+    const phoneInput = document.getElementById("customer-phone");
+    if (phoneInput) phoneInput.placeholder = isAr ? "أدخل رقم الهاتف" : "Enter phone number";
+
+    const instrInput = document.getElementById("customer-instructions");
+    if (instrInput) instrInput.placeholder = isAr ? "أي طلب خاص؟" : "Any special request?";
+
+    const addrInput = document.getElementById("customer-address");
+    if (addrInput) addrInput.placeholder = isAr ? "أدخل عنوان التوصيل" : "Enter your delivery address";
+
+    const mapInput = document.getElementById("customer-map-link");
+    if (mapInput) mapInput.placeholder = isAr ? "الصق رابط موقعك في خرائط جوجل" : "Paste your Google Maps location link";
+
+    // Payment
+    const payTitle = document.querySelector(".payment-title");
+    if (payTitle) payTitle.textContent = isAr ? "طريقة الدفع" : "Payment Method";
+
+    // Place order button
+    const placeBtn = document.getElementById("place-order-button");
+    if (placeBtn && !placeBtn.classList.contains("loading") && !placeBtn.classList.contains("success")) {
+        placeBtn.textContent = isAr ? "اطلب الآن" : "PLACE ORDER";
+    }
+
+    // Track order button
+    const trackBtn = document.getElementById("track-order-button");
+    if (trackBtn) trackBtn.textContent = isAr ? "📍 تتبع طلبي" : "📍 Track My Order";
+
+    // Reviews section
+    const reviewsTitle = document.querySelector(".reviews-title");
+    if (reviewsTitle) reviewsTitle.textContent = isAr ? "تقييمات العملاء" : "Customer Reviews";
+
+    const reviewFormTitle = document.querySelector(".review-form-title");
+    if (reviewFormTitle) reviewFormTitle.textContent = isAr ? "اترك تقييمك" : "Leave a Review";
+
+    const reviewNameInput = document.getElementById("review-name");
+    if (reviewNameInput) reviewNameInput.placeholder = isAr ? "اسمك" : "Your name";
+
+    const reviewCommentInput = document.getElementById("review-comment");
+    if (reviewCommentInput) reviewCommentInput.placeholder = isAr ? "اكتب تقييمك..." : "Write your review...";
+
+    const reviewSubmitBtn = document.getElementById("review-submit-btn");
+    if (reviewSubmitBtn && !reviewSubmitBtn.disabled) {
+        reviewSubmitBtn.textContent = isAr ? "إرسال التقييم" : "Submit Review";
+    }
+
+    // Reviews button
+    const reviewsBtn = document.getElementById("open-reviews-btn");
+    if (reviewsBtn) reviewsBtn.textContent = isAr ? "⭐ التقييمات" : "⭐ Reviews";
+
+    // Total label
+    const totalLabel = document.querySelector(".total-row span");
+    if (totalLabel) totalLabel.textContent = isAr ? "المجموع" : "Total";
+
+    // Find us button
+    const mapButton = document.querySelector(".shop-card-map-link");
+    if (mapButton) mapButton.textContent = isAr ? "🗺️ عرض على الخريطة" : "🗺️ View on Map";
 }
 
 
@@ -179,19 +333,20 @@ function getMobileOverlay() {
 
 function getCategories() {
 
-    return [
+    const seen = new Set();
+    const categories = [{ name: "All", nameAr: "الكل" }];
 
-        "All",
+    window.menu.forEach(item => {
+        if (!seen.has(item.category)) {
+            seen.add(item.category);
+            categories.push({
+                name: item.category,
+                nameAr: item.categoryAr || item.category
+            });
+        }
+    });
 
-        ...new Set(
-
-            window.menu.map(
-                item => item.category
-            )
-
-        )
-
-    ];
+    return categories;
 
 }
 
@@ -210,21 +365,22 @@ function renderCategoryTabs() {
 
 
     categoryTabs.innerHTML =
-        categories.map(category => {
+        categories.map(cat => {
 
             const activeClass =
-                category === activeCategory
+                cat.name === activeCategory
                     ? "active"
                     : "";
 
+            const displayName = currentLang === "ar" ? cat.nameAr : cat.name;
 
             return `
                 <button
                     type="button"
                     class="category-tab ${activeClass}"
-                    data-category="${escapeHTML(category)}"
+                    data-category="${escapeHTML(cat.name)}"
                 >
-                    ${escapeHTML(category)}
+                    ${escapeHTML(displayName)}
                 </button>
             `;
 
@@ -501,14 +657,14 @@ function renderCategoryCard(
 
                     <h2>
 
-                        ${escapeHTML(category)}
+                        ${currentLang === "ar" ? escapeHTML(items[0].categoryAr || category) : escapeHTML(category)}
 
                     </h2>
 
 
                     <span class="category-count">
 
-                        ${items.length} Items
+                        ${items.length} ${currentLang === "ar" ? "صنف" : "Items"}
 
                     </span>
 
@@ -557,9 +713,9 @@ function renderCategoryCard(
 
                                 isExpanded
 
-                                    ? "Show Less"
+                                    ? (currentLang === "ar" ? "عرض أقل" : "Show Less")
 
-                                    : `Show More (${items.length - ITEMS_PER_CATEGORY})`
+                                    : (currentLang === "ar" ? `عرض المزيد (${items.length - ITEMS_PER_CATEGORY})` : `Show More (${items.length - ITEMS_PER_CATEGORY})`)
 
                             }
 
@@ -600,6 +756,8 @@ function renderMenuItem(item) {
             : "/static/images/placeholder.jpg";
 
 
+    const prices = item.prices || [item.price];
+
     return `
 
         <div class="menu-item">
@@ -622,15 +780,13 @@ function renderMenuItem(item) {
 
                 <h3>
 
-                    ${escapeHTML(item.name)}
+                    ${currentLang === "ar" ? escapeHTML(item.nameAr || item.name) : escapeHTML(item.name)}
 
                 </h3>
 
 
                 <span class="menu-price">
-
-                    ${formatPriceOptions(item.prices || [item.price])}
-
+                    OMR ${prices.map(formatPrice).join(" / ")}
                 </span>
 
             </div>
@@ -683,27 +839,42 @@ function attachMenuButtons() {
                 const itemName =
                     this.dataset.name;
 
+                const menuItem =
+                    window.menu.find(
+                        item => item.name === itemName
+                    );
+
+                const prices = menuItem
+                    ? (menuItem.prices || [menuItem.price])
+                    : [];
+
+                // If multiple prices, show size popup
+                if (prices.length > 1) {
+                    showSizePopup(itemName, prices);
+                    return;
+                }
 
                 addItemToCart(itemName);
-
 
                 this.classList.add(
                     "added"
                 );
 
-
                 setTimeout(() => {
-
                     this.classList.remove(
                         "added"
                     );
-
                 }, 300);
 
             }
         );
 
     });
+
+
+    // ========================================
+    // SIZE BUTTONS (removed - now using popup)
+    // ========================================
 
 
     // ========================================
@@ -763,7 +934,7 @@ function attachMenuButtons() {
 // ADD ITEM TO CART
 // ============================================
 
-function addItemToCart(itemName, selectedPrice) {
+function addItemToCart(itemName, selectedPrice, selectedSize) {
 
     const menuItem =
         window.menu.find(
@@ -783,12 +954,15 @@ function addItemToCart(itemName, selectedPrice) {
 
     }
 
+    const finalPrice = selectedPrice || Number(menuItem.price) || 0;
+    const finalSize = selectedSize || "";
 
     const existingItem =
         cart.find(
             item =>
                 item.name === menuItem.name &&
-                item.price === (selectedPrice || menuItem.price)
+                item.price === finalPrice &&
+                item.size === finalSize
         );
 
 
@@ -806,7 +980,10 @@ function addItemToCart(itemName, selectedPrice) {
                 menuItem.name,
 
             price:
-                selectedPrice || Number(menuItem.price) || 0,
+                finalPrice,
+
+            size:
+                finalSize,
 
             image:
                 menuItem.image || "",
@@ -821,6 +998,79 @@ function addItemToCart(itemName, selectedPrice) {
 
     renderCart();
 
+}
+
+
+// ============================================
+// SIZE SELECTION POPUP
+// ============================================
+
+function showSizePopup(itemName, prices) {
+
+    // Remove existing popup if any
+    const existing = document.querySelector(".size-popup-overlay");
+    if (existing) existing.remove();
+
+    const sizeLabels =
+        prices.length === 3
+            ? (currentLang === "ar" ? ["صغير", "وسط", "كبير"] : ["Small", "Medium", "Large"])
+            : (currentLang === "ar" ? ["صغير", "كبير"] : ["Small", "Large"]);
+
+    const menuItem = window.menu.find(item => item.name === itemName);
+    const displayName = currentLang === "ar" && menuItem ? (menuItem.nameAr || itemName) : itemName;
+
+    const buttonsHTML = prices.map((p, i) => `
+        <button
+            type="button"
+            class="size-popup-btn"
+            data-price="${p}"
+            data-size="${sizeLabels[i]}"
+        >
+            <span class="size-popup-label">${sizeLabels[i]}</span>
+            <span class="size-popup-price">OMR ${formatPrice(p)}</span>
+        </button>
+    `).join("");
+
+    const popupHTML = `
+        <div class="size-popup-overlay" id="size-popup-overlay">
+            <div class="size-popup">
+                <div class="size-popup-header">
+                    <h3>${escapeHTML(displayName)}</h3>
+                    <p>${currentLang === "ar" ? "اختر الحجم" : "Choose your size"}</p>
+                </div>
+                <div class="size-popup-options">
+                    ${buttonsHTML}
+                </div>
+                <button type="button" class="size-popup-cancel">${currentLang === "ar" ? "إلغاء" : "Cancel"}</button>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", popupHTML);
+
+    const overlay = document.getElementById("size-popup-overlay");
+
+    // Size button clicks
+    overlay.querySelectorAll(".size-popup-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            const price = parseFloat(this.dataset.price);
+            const size = this.dataset.size;
+            addItemToCart(itemName, price, size);
+            showOrderMessage(itemName + " (" + size + ") added!", "success");
+            overlay.remove();
+        });
+    });
+
+    // Cancel / close
+    overlay.querySelector(".size-popup-cancel").addEventListener("click", function() {
+        overlay.remove();
+    });
+
+    overlay.addEventListener("click", function(e) {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
 }
 
 
@@ -883,13 +1133,13 @@ function renderCart() {
 
                 <p>
 
-                    Your cart is empty
+                    ${currentLang === "ar" ? "سلتك فارغة" : "Your cart is empty"}
 
                 </p>
 
                 <span>
 
-                    Add something delicious from the menu.
+                    ${currentLang === "ar" ? "أضف شيئاً لذيذاً من القائمة" : "Add something delicious from the menu."}
 
                 </span>
 
@@ -932,7 +1182,7 @@ function renderCart() {
 
                                 <div class="cart-item-name">
 
-                                    ${escapeHTML(item.name)}
+                                    ${escapeHTML(item.name)}${item.size ? ' <span class="cart-size-label">(' + item.size + ')</span>' : ''}
 
                                 </div>
 
@@ -1426,6 +1676,18 @@ async function placeOrder() {
         instructions:
             instructions,
 
+        address:
+            document
+                .getElementById("customer-address")
+                ?.value
+                .trim() || "",
+
+        map_link:
+            document
+                .getElementById("customer-map-link")
+                ?.value
+                .trim() || "",
+
         payment_method:
             paymentMethod,
 
@@ -1588,6 +1850,25 @@ async function placeOrder() {
         }
 
 
+        const addressInput =
+            document.getElementById(
+                "customer-address"
+            );
+
+        const mapLinkInput =
+            document.getElementById(
+                "customer-map-link"
+            );
+
+        if (addressInput) {
+            addressInput.value = "";
+        }
+
+        if (mapLinkInput) {
+            mapLinkInput.value = "";
+        }
+
+
         // Reset button after success
 
         setTimeout(() => {
@@ -1738,6 +2019,145 @@ function showOrderSuccess(orderId) {
 
     );
 
+    // Open live tracking modal
+    openOrderTracking(orderId);
+
+}
+
+
+// ============================================
+// ORDER TRACKING (Swiggy/Zomato Style)
+// ============================================
+
+let trackingOrderId = null;
+let trackingInterval = null;
+
+function openOrderTracking(orderId) {
+
+    trackingOrderId = orderId;
+
+    const overlay = document.getElementById("tracking-overlay");
+    const modal = document.getElementById("tracking-modal");
+    const orderIdLabel = document.getElementById("tracking-order-id");
+
+    if (!overlay || !modal) return;
+
+    orderIdLabel.textContent = "Order #" + orderId;
+
+    // Set initial state to NEW
+    updateTrackingUI("NEW");
+
+    // Show modal
+    overlay.classList.add("active");
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // Start polling every 4 seconds
+    if (trackingInterval) clearInterval(trackingInterval);
+
+    trackingInterval = setInterval(function() {
+        pollOrderStatus(orderId);
+    }, 4000);
+
+    // First poll immediately
+    pollOrderStatus(orderId);
+
+    // Attach close handlers
+    const closeBtn = document.getElementById("tracking-close");
+    if (closeBtn) {
+        closeBtn.onclick = closeOrderTracking;
+    }
+
+    overlay.onclick = closeOrderTracking;
+
+    // Show the Track Order button
+    const trackBtn = document.getElementById("track-order-button");
+    if (trackBtn) {
+        trackBtn.style.display = "block";
+    }
+}
+
+
+function reopenTracking() {
+    if (trackingOrderId) {
+        openOrderTracking(trackingOrderId);
+    }
+}
+
+window.reopenTracking = reopenTracking;
+
+
+function closeOrderTracking() {
+
+    const overlay = document.getElementById("tracking-overlay");
+    const modal = document.getElementById("tracking-modal");
+
+    if (overlay) overlay.classList.remove("active");
+    if (modal) modal.classList.remove("active");
+    document.body.style.overflow = "";
+
+    if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+    }
+}
+
+
+async function pollOrderStatus(orderId) {
+
+    try {
+        const response = await fetch("/api/order-status/" + orderId);
+        const data = await response.json();
+
+        if (data.success) {
+            updateTrackingUI(data.status);
+
+            // Stop polling when completed
+            if (data.status === "COMPLETED") {
+                if (trackingInterval) {
+                    clearInterval(trackingInterval);
+                    trackingInterval = null;
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Tracking poll error:", error);
+    }
+}
+
+
+function updateTrackingUI(currentStatus) {
+
+    const steps = document.querySelectorAll(".tracking-step");
+    const statusOrder = ["NEW", "PREPARING", "READY", "COMPLETED"];
+    const currentIndex = statusOrder.indexOf(currentStatus);
+
+    steps.forEach(function(step, index) {
+
+        step.classList.remove("completed", "active");
+
+        if (index < currentIndex) {
+            step.classList.add("completed");
+        } else if (index === currentIndex) {
+            step.classList.add("active");
+        }
+    });
+
+    // Update status message
+    const emoji = document.getElementById("tracking-emoji");
+    const message = document.getElementById("tracking-message");
+
+    const messages = {
+        "NEW": { emoji: "📝", text: "Order received! Waiting for kitchen..." },
+        "PREPARING": { emoji: "👨‍🍳", text: "Your food is being prepared!" },
+        "READY": { emoji: "✅", text: "Your order is ready! Come pick it up." },
+        "COMPLETED": { emoji: "🎉", text: "Enjoy your meal! Thank you." }
+    };
+
+    const msg = messages[currentStatus] || messages["NEW"];
+
+    if (emoji) emoji.textContent = msg.emoji;
+    if (message) message.textContent = msg.text;
 }
 
 
@@ -1835,4 +2255,200 @@ function formatPriceOptions(prices) {
         .map(formatPrice)
         .join("/");
 
+}
+
+
+// ============================================
+// CUSTOMER REVIEWS
+// ============================================
+
+let selectedRating = 0;
+
+function initReviews() {
+
+    setupStarInput();
+    setupReviewSubmit();
+    loadReviews();
+}
+
+function openReviewsModal() {
+
+    const overlay = document.getElementById("reviews-modal-overlay");
+    const modal = document.getElementById("reviews-modal");
+
+    if (overlay) overlay.classList.add("active");
+    if (modal) modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    loadReviews();
+}
+
+window.openReviewsModal = openReviewsModal;
+
+function closeReviewsModal() {
+
+    const overlay = document.getElementById("reviews-modal-overlay");
+    const modal = document.getElementById("reviews-modal");
+
+    if (overlay) overlay.classList.remove("active");
+    if (modal) modal.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+window.closeReviewsModal = closeReviewsModal;
+
+function setupStarInput() {
+
+    const stars = document.querySelectorAll(".star-input");
+
+    stars.forEach(function(star) {
+
+        star.addEventListener("click", function() {
+            selectedRating = parseInt(this.dataset.star);
+            updateStarDisplay();
+        });
+
+        star.addEventListener("mouseenter", function() {
+            const hoverVal = parseInt(this.dataset.star);
+            stars.forEach(function(s, i) {
+                s.classList.toggle("active", i < hoverVal);
+            });
+        });
+    });
+
+    const container = document.getElementById("review-stars-input");
+    if (container) {
+        container.addEventListener("mouseleave", function() {
+            updateStarDisplay();
+        });
+    }
+
+    // Close on overlay click
+    const overlay = document.getElementById("reviews-modal-overlay");
+    if (overlay) {
+        overlay.addEventListener("click", closeReviewsModal);
+    }
+}
+
+function updateStarDisplay() {
+
+    const stars = document.querySelectorAll(".star-input");
+    stars.forEach(function(s, i) {
+        s.classList.toggle("active", i < selectedRating);
+    });
+}
+
+function setupReviewSubmit() {
+
+    const btn = document.getElementById("review-submit-btn");
+    if (!btn) return;
+
+    btn.addEventListener("click", submitReview);
+}
+
+async function submitReview() {
+
+    const name = document.getElementById("review-name").value.trim();
+    const comment = document.getElementById("review-comment").value.trim();
+    const btn = document.getElementById("review-submit-btn");
+
+    if (!name) {
+        showOrderMessage(currentLang === "ar" ? "أدخل اسمك" : "Please enter your name", "error");
+        return;
+    }
+
+    if (selectedRating === 0) {
+        showOrderMessage(currentLang === "ar" ? "اختر التقييم" : "Please select a rating", "error");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = currentLang === "ar" ? "جاري الإرسال..." : "Submitting...";
+
+    try {
+
+        const response = await fetch("/api/reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                customer_name: name,
+                rating: selectedRating,
+                comment: comment
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showOrderMessage(currentLang === "ar" ? "شكراً لتقييمك!" : "Thank you for your review!", "success");
+            document.getElementById("review-name").value = "";
+            document.getElementById("review-comment").value = "";
+            selectedRating = 0;
+            updateStarDisplay();
+            loadReviews();
+        } else {
+            showOrderMessage(data.message || "Failed to submit", "error");
+        }
+
+    } catch (error) {
+        showOrderMessage("Network error", "error");
+    }
+
+    btn.disabled = false;
+    btn.textContent = currentLang === "ar" ? "إرسال التقييم" : "Submit Review";
+}
+
+async function loadReviews() {
+
+    const list = document.getElementById("reviews-list");
+    const avgEl = document.getElementById("reviews-avg");
+
+    try {
+
+        const response = await fetch("/api/reviews");
+        const data = await response.json();
+
+        if (!data.success) return;
+
+        // Update average
+        if (avgEl && data.count > 0) {
+            avgEl.innerHTML = `
+                <span class="avg-stars">${renderStars(data.average)}</span>
+                <span class="avg-number">${data.average}/5 (${data.count})</span>
+            `;
+        }
+
+        // Render reviews
+        if (!list) return;
+
+        if (data.reviews.length === 0) {
+            list.innerHTML = `<p class="no-reviews">${currentLang === "ar" ? "لا توجد تقييمات بعد. كن أول من يقيم!" : "No reviews yet. Be the first to review!"}</p>`;
+            return;
+        }
+
+        list.innerHTML = data.reviews.map(function(r) {
+            return `
+                <div class="review-card">
+                    <div class="review-card-top">
+                        <span class="review-card-name">${escapeHTML(r.customer_name)}</span>
+                        <span class="review-card-stars">${renderStars(r.rating)}</span>
+                    </div>
+                    ${r.comment ? '<p class="review-card-comment">' + escapeHTML(r.comment) + '</p>' : ''}
+                    <div class="review-card-date">${r.created_at}</div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        if (list) list.innerHTML = '<p class="no-reviews">Unable to load reviews</p>';
+    }
+}
+
+function renderStars(rating) {
+
+    const full = Math.floor(rating);
+    const half = rating % 1 >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+
+    return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
 }

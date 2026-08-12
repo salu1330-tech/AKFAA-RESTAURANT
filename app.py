@@ -135,6 +135,51 @@ def init_db():
 
 
         # ----------------------------------------------------
+        # ADD ADDRESS COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "address" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN address TEXT
+            """)
+
+
+        # ----------------------------------------------------
+        # ADD MAP LINK COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "map_link" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN map_link TEXT
+            """)
+
+
+        # ----------------------------------------------------
+        # CREATE REVIEWS TABLE
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS reviews (
+
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                customer_name TEXT,
+
+                rating INTEGER,
+
+                comment TEXT,
+
+                created_at TEXT
+
+            )
+        """)
+
+
+        # ----------------------------------------------------
         # COMMIT
         # ----------------------------------------------------
 
@@ -319,6 +364,22 @@ def place_order():
         )
 
 
+        address = str(
+            data.get(
+                "address",
+                ""
+            )
+        )
+
+
+        map_link = str(
+            data.get(
+                "map_link",
+                ""
+            )
+        )
+
+
         # ----------------------------------------------------
         # TOTAL
         # ----------------------------------------------------
@@ -369,6 +430,10 @@ def place_order():
 
                 payment_method,
 
+                address,
+
+                map_link,
+
                 items,
 
                 total,
@@ -379,7 +444,7 @@ def place_order():
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
 
             table_number,
@@ -391,6 +456,10 @@ def place_order():
             instructions,
 
             payment_method,
+
+            address,
+
+            map_link,
 
             json.dumps(
                 items,
@@ -612,6 +681,18 @@ def admin():
                         or "Pay at Counter"
                     ),
 
+                    "address": (
+                        order["address"]
+                        if "address" in order.keys()
+                        else ""
+                    ) or "",
+
+                    "map_link": (
+                        order["map_link"]
+                        if "map_link" in order.keys()
+                        else ""
+                    ) or "",
+
                     "total": float(
                         order["total"]
                         or 0
@@ -790,6 +871,18 @@ def api_orders():
                     order["payment_method"]
                     or "Pay at Counter"
                 ),
+
+                "address": (
+                    order["address"]
+                    if "address" in order.keys()
+                    else ""
+                ) or "",
+
+                "map_link": (
+                    order["map_link"]
+                    if "map_link" in order.keys()
+                    else ""
+                ) or "",
 
                 "items": cleaned_items,
 
@@ -988,6 +1081,155 @@ def delete_order(order_id):
 
         })
 
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# SUBMIT REVIEW API
+# ============================================================
+
+@app.route(
+    "/api/reviews",
+    methods=["POST"]
+)
+def submit_review():
+
+    try:
+
+        data = request.get_json(silent=True)
+
+        if not data:
+            return jsonify({
+                "success": False,
+                "message": "Invalid data."
+            }), 400
+
+        customer_name = str(data.get("customer_name", "")).strip()
+        rating = data.get("rating", 0)
+        comment = str(data.get("comment", "")).strip()
+
+        if not customer_name:
+            return jsonify({
+                "success": False,
+                "message": "Name is required."
+            }), 400
+
+        if not rating or int(rating) < 1 or int(rating) > 5:
+            return jsonify({
+                "success": False,
+                "message": "Rating must be 1-5."
+            }), 400
+
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        conn = get_db_connection()
+
+        conn.execute("""
+            INSERT INTO reviews (customer_name, rating, comment, created_at)
+            VALUES (?, ?, ?, ?)
+        """, (customer_name, int(rating), comment, created_at))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "message": "Review submitted. Thank you!"
+        })
+
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+
+# ============================================================
+# GET REVIEWS API
+# ============================================================
+
+@app.route(
+    "/api/reviews",
+    methods=["GET"]
+)
+def get_reviews():
+
+    conn = get_db_connection()
+
+    try:
+
+        reviews = conn.execute("""
+            SELECT * FROM reviews
+            ORDER BY id DESC
+            LIMIT 20
+        """).fetchall()
+
+        result = []
+
+        for r in reviews:
+            result.append({
+                "id": r["id"],
+                "customer_name": r["customer_name"] or "",
+                "rating": r["rating"] or 5,
+                "comment": r["comment"] or "",
+                "created_at": r["created_at"] or ""
+            })
+
+        # Calculate average
+        avg_rating = 0
+        if result:
+            avg_rating = round(
+                sum(r["rating"] for r in result) / len(result), 1
+            )
+
+        return jsonify({
+            "success": True,
+            "reviews": result,
+            "count": len(result),
+            "average": avg_rating
+        })
+
+    finally:
+        conn.close()
+
+
+# ============================================================
+# ORDER STATUS API (FOR CUSTOMER TRACKING)
+# ============================================================
+
+@app.route(
+    "/api/order-status/<int:order_id>",
+    methods=["GET"]
+)
+def order_status(order_id):
+
+    conn = get_db_connection()
+
+    try:
+
+        order = conn.execute("""
+            SELECT id, status, created_at
+            FROM orders
+            WHERE id = ?
+        """, (order_id,)).fetchone()
+
+        if not order:
+
+            return jsonify({
+                "success": False,
+                "message": "Order not found."
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "order_id": order["id"],
+            "status": order["status"] or "NEW",
+            "created_at": order["created_at"] or ""
+        })
 
     finally:
 
