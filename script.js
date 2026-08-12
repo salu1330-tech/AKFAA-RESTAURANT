@@ -792,18 +792,32 @@ function renderMenuItem(item) {
             </div>
 
 
-            <!-- ADD BUTTON -->
+            <!-- ADD/REMOVE BUTTONS -->
 
-            <button
-                type="button"
-                class="add-to-cart"
-                data-name="${escapeHTML(item.name)}"
-                aria-label="Add ${escapeHTML(item.name)} to cart"
-            >
+            <div class="menu-item-actions">
 
-                +
+                ${getCartQuantity(item.name) > 0 ? `
+                    <button
+                        type="button"
+                        class="remove-from-cart"
+                        data-name="${escapeHTML(item.name)}"
+                        aria-label="Remove ${escapeHTML(item.name)} from cart"
+                    >
+                        −
+                    </button>
+                    <span class="menu-item-qty">${getCartQuantity(item.name)}</span>
+                ` : ''}
 
-            </button>
+                <button
+                    type="button"
+                    class="add-to-cart"
+                    data-name="${escapeHTML(item.name)}"
+                    aria-label="Add ${escapeHTML(item.name)} to cart"
+                >
+                    +
+                </button>
+
+            </div>
 
 
         </div>
@@ -875,6 +889,29 @@ function attachMenuButtons() {
     // ========================================
     // SIZE BUTTONS (removed - now using popup)
     // ========================================
+
+    // ========================================
+    // REMOVE FROM CART (minus button)
+    // ========================================
+
+    const removeButtons =
+        document.querySelectorAll(
+            ".remove-from-cart"
+        );
+
+    removeButtons.forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                const itemName = this.dataset.name;
+                removeItemFromCart(itemName);
+
+            }
+        );
+
+    });
 
 
     // ========================================
@@ -997,8 +1034,44 @@ function addItemToCart(itemName, selectedPrice, selectedSize) {
 
 
     renderCart();
+    renderMenu();
 
 }
+
+
+// ============================================
+// GET CART QUANTITY FOR ITEM
+// ============================================
+
+function getCartQuantity(itemName) {
+
+    return cart
+        .filter(item => item.name === itemName)
+        .reduce((sum, item) => sum + item.quantity, 0);
+}
+
+
+// ============================================
+// REMOVE ITEM FROM CART (by name, reduce by 1)
+// ============================================
+
+function removeItemFromCart(itemName) {
+
+    const index = cart.findIndex(item => item.name === itemName);
+
+    if (index === -1) return;
+
+    cart[index].quantity -= 1;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    renderCart();
+    renderMenu();
+}
+
+window.removeItemFromCart = removeItemFromCart;
 
 
 // ============================================
