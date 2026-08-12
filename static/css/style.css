@@ -674,6 +674,28 @@ textarea {
     font-weight: 700;
 }
 
+.price-tier {
+    display: block;
+
+    width: 100%;
+
+    max-width: 180px;
+
+    margin-top: 8px;
+
+    padding: 6px 8px;
+
+    border: 1px solid var(--gold);
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    color: var(--text);
+
+    font: inherit;
+}
+
 
 /* ==========================================
    ADD BUTTON

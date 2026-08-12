@@ -629,7 +629,7 @@ function renderMenuItem(item) {
 
                 <span class="menu-price">
 
-                    OMR ${formatPrice(item.price)}
+                    ${formatPriceOptions(item.prices || [item.price])}
 
                 </span>
 
@@ -684,9 +684,7 @@ function attachMenuButtons() {
                     this.dataset.name;
 
 
-                addItemToCart(
-                    itemName
-                );
+                addItemToCart(itemName);
 
 
                 this.classList.add(
@@ -765,7 +763,7 @@ function attachMenuButtons() {
 // ADD ITEM TO CART
 // ============================================
 
-function addItemToCart(itemName) {
+function addItemToCart(itemName, selectedPrice) {
 
     const menuItem =
         window.menu.find(
@@ -789,7 +787,8 @@ function addItemToCart(itemName) {
     const existingItem =
         cart.find(
             item =>
-                item.name === menuItem.name
+                item.name === menuItem.name &&
+                item.price === (selectedPrice || menuItem.price)
         );
 
 
@@ -807,7 +806,7 @@ function addItemToCart(itemName) {
                 menuItem.name,
 
             price:
-                Number(menuItem.price) || 0,
+                selectedPrice || Number(menuItem.price) || 0,
 
             image:
                 menuItem.image || "",
@@ -1826,5 +1825,14 @@ function escapeHTML(value) {
 
 
     return div.innerHTML;
+
+}
+
+
+function formatPriceOptions(prices) {
+
+    return prices
+        .map(formatPrice)
+        .join("/");
 
 }

@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AKFAA Coffee Shop | Admin Dashboard</title>
+
+
+    <style>
+
+        /* =========================================
+           AKFAA ADMIN DASHBOARD
+           ========================================= */
+
+        :root {
+            --dark-green: #10251b;
+            --header-green: #0a1a12;
+            --card-green: #1c3829;
+            --gold: #d4af37;
+            --cream: #f8f5ee;
+            --new: #e74c3c;
+            --preparing: #f39c12;
+            --ready: #27ae60;
+            --completed: #3498db;
+        }
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: var(--dark-green);
+            color: white;
+        }
+
+
+        /* =========================================
+           HEADER
+           ========================================= */
+
+        .admin-header {
+            background: var(--header-green);
+            border-bottom: 2px solid var(--gold);
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+
+        .admin-header h1 {
+            margin: 0;
+            color: var(--gold);
+            font-size: 30px;
+        }
+
+
+        .admin-header .arabic-name {
+            margin: 8px 0;
+            font-size: 20px;
+            color: var(--cream);
+        }
+
+
+        .admin-header p {
+            margin: 8px 0 0;
+            color: #cccccc;
+        }
+
+
+        /* =========================================
+           MAIN DASHBOARD
+           ========================================= */
+
+        .dashboard {
+            max-width: 1400px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+
+        .dashboard-title {
+            color: var(--gold);
+            margin: 0 0 25px;
+        }
+
+
+        /* =========================================
+           ORDERS GRID
+           ========================================= */
+
+        .orders {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(320px, 1fr)
+                );
+            gap: 20px;
+        }
+
+
+        /* =========================================
+           ORDER CARD
+           ========================================= */
+
+        .order {
+            background: var(--card-green);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 7px solid var(--gold);
+            box-shadow:
+                0 8px 25px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* =========================================
+           STATUS CARD COLORS
+           ========================================= */
+
+        .new {
+            border-left-color: var(--new);
+        }
+
+
+        .preparing {
+            border-left-color: var(--preparing);
+        }
+
+
+        .ready {
+            border-left-color: var(--ready);
+        }
+
+
+        .completed {
+            border-left-color: var(--completed);
+            opacity: 0.85;
+        }
+
+
+        /* =========================================
+           ORDER TOP
+           ========================================= */
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+
+        .order-number {
+            margin: 0;
+            color: var(--gold);
+            font-size: 22px;
+        }
+
+
+        .status {
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+
+        .status-new {
+            background: var(--new);
+            color: white;
+        }
+
+
+        .status-preparing {
+            background: var(--preparing);
+            color: #111;
+        }
+
+
+        .status-ready {
+            background: var(--ready);
+            color: white;
+        }
+
+
+        .status-completed {
+            background: var(--completed);
+            color: white;
+        }
+
+
+        /* =========================================
+           ORDER INFORMATION
+           ========================================= */
+
+        .order-info {
+            background:
+                rgba(255, 255, 255, 0.04);
+
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+
+        .order-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+
+        .order-info b {
+            color: var(--gold);
+        }
+
+
+        /* =========================================
+           ITEMS
+           ========================================= */
+
+        .items-title {
+            color: var(--gold);
+            margin: 15px 0 10px;
+        }
+
+
+        .items-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        .items-list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255, 255, 255, 0.1);
+        }
+
+
+        .item-name {
+            flex: 1;
+        }
+
+
+        .item-price {
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+
+        /* =========================================
+           TOTAL
+           ========================================= */
+
+        .total {
+            margin-top: 20px;
+            padding: 15px;
+
+            background:
+                rgba(212, 175, 55, 0.12);
+
+            border-radius: 10px;
+            font-size: 21px;
+            color: var(--gold);
+            font-weight: bold;
+            text-align: center;
+        }
+
+
+        /* =========================================
+           CUSTOMER NOTE
+           ========================================= */
+
+        .note {
+            margin-top: 15px;
+            padding: 12px;
+
+            background:
+                rgba(255, 255, 255, 0.06);
+
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================
+           ACTION BUTTONS
+           ========================================= */
+
+        .actions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+
+        .actions form {
+            margin: 0;
+        }
+
+
+        button {
+            width: 100%;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+
+        .preparing-btn {
+            background: var(--preparing);
+            color: #111;
+        }
+
+
+        .ready-btn {
+            background: var(--ready);
+            color: white;
+        }
+
+
+        .complete-btn {
+            background: var(--completed);
+            color: white;
+        }
+
+
+        /* =========================================
+           EMPTY ORDERS
+           ========================================= */
+
+        .no-orders {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: var(--card-green);
+            padding: 50px 20px;
+            border-radius: 15px;
+            color: #cccccc;
+        }
+
+
+        /* =========================================
+           MOBILE
+           ========================================= */
+
+        @media (max-width: 600px) {
+
+            .dashboard {
+                padding: 20px 12px;
+            }
+
+
+            .admin-header h1 {
+                font-size: 23px;
+            }
+
+
+            .orders {
+                grid-template-columns: 1fr;
+            }
+
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+
+            .order-top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         ADMIN HEADER
+         ========================================= -->
+
+    <header class="admin-header">
+
+        <h1>
+            ☕ AKFAA Coffee Shop
+        </h1>
+
+
+        <div class="arabic-name">
+
+            أكفاء للأعمال والتطوير
+
+        </div>
+
+
+        <p>
+
+            Order Management Dashboard
+
+        </p>
+
+    </header>
+
+
+    <!-- =========================================
+         DASHBOARD
+         ========================================= -->
+
+    <main class="dashboard">
+
+
+        <h2 class="dashboard-title">
+
+            📋 Current Orders
+
+        </h2>
+
+
+        <div class="orders">
+
+
+            {% if orders_data %}
+
+
+                {% for entry in orders_data %}
+
+
+                    <div
+                        class="order
+                        {% if entry['order']['status'] == 'NEW' %}
+                            new
+                        {% elif entry['order']['status'] == 'PREPARING' %}
+                            preparing
+                        {% elif entry['order']['status'] == 'READY' %}
+                            ready
+                        {% elif entry['order']['status'] == 'COMPLETED' %}
+                            completed
+                        {% endif %}
+                        "
+                    >
+
+
+                        <!-- ORDER HEADER -->
+
+                        <div class="order-top">
+
+
+                            <h2 class="order-number">
+
+                                Order
+                                #{{ entry["order"]["id"] }}
+
+                            </h2>
+
+
+                            {% if entry["order"]["status"] == "NEW" %}
+
+                                <span
+                                    class="status status-new"
+                                >
+
+                                    NEW
+
+                                </span>
+
+
+                            {% elif entry["order"]["status"] == "PREPARING" %}
+
+                                <span
+                                    class="status status-preparing"
+                                >
+
+                                    PREPARING
+
+                                </span>
+
+
+                            {% elif entry["order"]["status"] == "READY" %}
+
+                                <span
+                                    class="status status-ready"
+                                >
+
+                                    READY
+
+                                </span>
+
+
+                            {% elif entry["order"]["status"] == "COMPLETED" %}
+
+                                <span
+                                    class="status status-completed"
+                                >
+
+                                    COMPLETED
+
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="status">
+
+                                    {{ entry["order"]["status"] }}
+
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- =========================================
+                             CUSTOMER INFORMATION
+                             ========================================= -->
+
+                        <div class="order-info">
+
+
+                            <p>
+
+                                <b>
+                                    🪑 Table:
+                                </b>
+
+                                {{ entry["order"]["table_no"] }}
+
+                            </p>
+
+
+                            <p>
+
+                                <b>
+                                    👤 Customer:
+                                </b>
+
+                                {{ entry["order"]["customer_name"] }}
+
+                            </p>
+
+
+                            <p>
+
+                                <b>
+                                    📞 Phone:
+                                </b>
+
+                                {{ entry["order"]["phone"] }}
+
+                            </p>
+
+
+                            <p>
+
+                                <b>
+                                    💳 Payment:
+                                </b>
+
+                                {{ entry["order"]["payment_method"] }}
+
+                            </p>
+
+
+                            <p>
+
+                                <b>
+                                    🕒 Ordered:
+                                </b>
+
+                                {{ entry["order"]["created_at"] }}
+
+                            </p>
+
+
+                        </div>
+
+
+                        <!-- =========================================
+                             ORDER ITEMS
+                             ========================================= -->
+
+                        <h3 class="items-title">
+
+                            🍽️ Items
+
+                        </h3>
+
+
+                        <ul class="items-list">
+
+
+                            {% for item in entry["items"] %}
+
+
+                                <li>
+
+
+                                    <span class="item-name">
+
+                                        {{ item["item_name"] }}
+
+                                        ×
+
+                                        {{ item["quantity"] }}
+
+                                    </span>
+
+
+                                    <span class="item-price">
+
+                                        OMR
+
+                                        {{ "%.3f"|format(
+                                            item["price"]
+                                            *
+                                            item["quantity"]
+                                        ) }}
+
+                                    </span>
+
+
+                                </li>
+
+
+                            {% endfor %}
+
+
+                        </ul>
+
+
+                        <!-- =========================================
+                             TOTAL
+                             ========================================= -->
+
+                        <div class="total">
+
+                            Total:
+
+                            OMR
+
+                            {{ "%.3f"|format(
+                                entry["order"]["total"]
+                            ) }}
+
+                        </div>
+
+
+                        <!-- =========================================
+                             CUSTOMER NOTE
+                             ========================================= -->
+
+                        {% if entry["order"]["instructions"] %}
+
+
+                            <div class="note">
+
+                                📝
+
+                                <b>
+                                    Customer Note:
+                                </b>
+
+                                {{ entry["order"]["instructions"] }}
+
+                            </div>
+
+
+                        {% endif %}
+
+
+                        <!-- =========================================
+                             STATUS ACTIONS
+                             ========================================= -->
+
+                        {% if entry["order"]["status"] != "COMPLETED" %}
+
+
+                            <div class="actions">
+
+
+                                {% if entry["order"]["status"] != "PREPARING" %}
+
+
+                                    <form
+                                        action="{{ url_for(
+                                            'update_status',
+                                            order_id=entry['order']['id'],
+                                            status='PREPARING'
+                                        ) }}"
+                                        method="POST"
+                                    >
+
+
+                                        <button
+                                            type="submit"
+                                            class="preparing-btn"
+                                        >
+
+                                            👨‍🍳 Preparing
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                {% endif %}
+
+
+                                {% if entry["order"]["status"] != "READY" %}
+
+
+                                    <form
+                                        action="{{ url_for(
+                                            'update_status',
+                                            order_id=entry['order']['id'],
+                                            status='READY'
+                                        ) }}"
+                                        method="POST"
+                                    >
+
+
+                                        <button
+                                            type="submit"
+                                            class="ready-btn"
+                                        >
+
+                                            ✅ Ready
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                {% endif %}
+
+
+                                <form
+                                    action="{{ url_for(
+                                        'update_status',
+                                        order_id=entry['order']['id'],
+                                        status='COMPLETED'
+                                    ) }}"
+                                    method="POST"
+                                >
+
+
+                                    <button
+                                        type="submit"
+                                        class="complete-btn"
+                                    >
+
+                                        ✔ Completed
+
+                                    </button>
+
+
+                                </form>
+
+
+                            </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="no-orders">
+
+
+                    <h2>
+
+                        No orders available
+
+                    </h2>
+
+
+                    <p>
+
+                        New customer orders will appear here.
+
+                    </p>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </main>
+
+
+</body>
+
+</html>

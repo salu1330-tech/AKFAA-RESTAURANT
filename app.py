@@ -1,56 +1,175 @@
-from flask import Flask, render_template, request, jsonify
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    url_for,
+    send_from_directory
+)
+
 import sqlite3
 import json
+import os
 from datetime import datetime
 
 
-# ============================================
+# ============================================================
 # FLASK APPLICATION
-# ============================================
+# ============================================================
 
 app = Flask(__name__)
 
 
-# ============================================
-# DATABASE
-# ============================================
+# ============================================================
+# PATH CONFIGURATION
+# ============================================================
 
-DATABASE = "orders.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+DATABASE = os.path.join(
+    BASE_DIR,
+    "orders.db"
+)
+
+PDF_FOLDER = os.path.join(
+    BASE_DIR,
+    "static",
+    "menu"
+)
+
+PDF_FILENAME = "AKFAA_Coffee_Shop_Full_Menu.pdf"
+
+
+# ============================================================
+# DATABASE CONNECTION
+# ============================================================
 
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
+
+    conn = sqlite3.connect(
+        DATABASE,
+        timeout=30
+    )
+
     conn.row_factory = sqlite3.Row
+
     return conn
 
+
+# ============================================================
+# DATABASE INITIALIZATION
+# ============================================================
 
 def init_db():
 
     conn = get_db_connection()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            table_number TEXT,
-            customer_name TEXT,
-            customer_phone TEXT,
-            instructions TEXT,
-            payment_method TEXT,
-            items TEXT,
-            total REAL,
-            created_at TEXT
+    try:
+
+        # ----------------------------------------------------
+        # CREATE ORDERS TABLE
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+                table_number TEXT,
+
+                customer_name TEXT,
+
+                customer_phone TEXT,
+
+                instructions TEXT,
+
+                payment_method TEXT,
+
+                items TEXT,
+
+                total REAL,
+
+                status TEXT DEFAULT 'NEW',
+
+                created_at TEXT
+
+            )
+        """)
+
+
+        # ----------------------------------------------------
+        # CHECK EXISTING COLUMNS
+        # ----------------------------------------------------
+
+        columns = [
+            column["name"]
+            for column in conn.execute(
+                "PRAGMA table_info(orders)"
+            ).fetchall()
+        ]
+
+
+        # ----------------------------------------------------
+        # ADD STATUS COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "status" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN status TEXT DEFAULT 'NEW'
+            """)
+
+
+        # ----------------------------------------------------
+        # ADD TABLE NUMBER COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "table_number" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN table_number TEXT
+            """)
+
+
+        # ----------------------------------------------------
+        # COMMIT
+        # ----------------------------------------------------
+
+        conn.commit()
+
+        print(
+            f"Database initialized successfully: {DATABASE}"
         )
-    """)
 
-    conn.commit()
-    conn.close()
+    except Exception as e:
 
-    print("Database initialized successfully.")
+        conn.rollback()
+
+        print(
+            f"Database initialization error: {e}"
+        )
+
+        raise
+
+    finally:
+
+        conn.close()
 
 
-# ============================================
+# ============================================================
+# INITIALIZE DATABASE
+# IMPORTANT FOR RENDER / GUNICORN
+# ============================================================
+
+init_db()
+
+
+# ============================================================
 # HOME PAGE
-# ============================================
+# ============================================================
 
 @app.route("/")
 def home():
@@ -61,121 +180,837 @@ def home():
     )
 
 
-# ============================================
-# PLACE ORDER API
-# ============================================
+# ============================================================
+# MENU PDF
+# PUBLIC URL
+# ============================================================
 
-@app.route("/place-order", methods=["POST"])
+@app.route("/menu-pdf")
+def menu_pdf():
+
+    return send_from_directory(
+        PDF_FOLDER,
+        PDF_FILENAME,
+        mimetype="application/pdf"
+    )
+
+
+# ============================================================
+# HEALTH CHECK
+# ============================================================
+
+@app.route("/health")
+def health():
+
+    return jsonify({
+        "success": True,
+        "status": "AKFAA Restaurant is running",
+        "database": DATABASE,
+        "time": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    })
+
+
+# ============================================================
+# PLACE ORDER API
+# ============================================================
+
+@app.route(
+    "/place-order",
+    methods=["POST"]
+)
 def place_order():
 
-    data = request.get_json()
+    try:
 
-    if not data:
+        # ----------------------------------------------------
+        # GET JSON DATA
+        # ----------------------------------------------------
+
+        data = request.get_json(
+            silent=True
+        )
+
+
+        # ----------------------------------------------------
+        # VALIDATE DATA
+        # ----------------------------------------------------
+
+        if not data:
+
+            return jsonify({
+                "success": False,
+                "message": "Invalid order data."
+            }), 400
+
+
+        # ----------------------------------------------------
+        # CHECK CART
+        # ----------------------------------------------------
+
+        items = data.get(
+            "items",
+            []
+        )
+
+
+        if not items:
+
+            return jsonify({
+                "success": False,
+                "message": "Cart is empty."
+            }), 400
+
+
+        # ----------------------------------------------------
+        # CUSTOMER NAME
+        # ----------------------------------------------------
+
+        customer_name = str(
+            data.get(
+                "customer_name",
+                ""
+            )
+        ).strip()
+
+
+        if not customer_name:
+
+            return jsonify({
+                "success": False,
+                "message": "Customer name is required."
+            }), 400
+
+
+        # ----------------------------------------------------
+        # CUSTOMER DATA
+        # ----------------------------------------------------
+
+        table_number = str(
+            data.get(
+                "table_number",
+                "Walk-in"
+            )
+        )
+
+
+        customer_phone = str(
+            data.get(
+                "customer_phone",
+                ""
+            )
+        )
+
+
+        instructions = str(
+            data.get(
+                "instructions",
+                ""
+            )
+        )
+
+
+        payment_method = str(
+            data.get(
+                "payment_method",
+                "Pay at Counter"
+            )
+        )
+
+
+        # ----------------------------------------------------
+        # TOTAL
+        # ----------------------------------------------------
+
+        try:
+
+            total = float(
+                data.get(
+                    "total",
+                    0
+                )
+            )
+
+        except (
+            ValueError,
+            TypeError
+        ):
+
+            total = 0
+
+
+        # ----------------------------------------------------
+        # CURRENT TIME
+        # ----------------------------------------------------
+
+        created_at = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+
+        # ----------------------------------------------------
+        # SAVE ORDER
+        # ----------------------------------------------------
+
+        conn = get_db_connection()
+
+
+        cursor = conn.execute("""
+            INSERT INTO orders (
+
+                table_number,
+
+                customer_name,
+
+                customer_phone,
+
+                instructions,
+
+                payment_method,
+
+                items,
+
+                total,
+
+                status,
+
+                created_at
+
+            )
+
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+
+            table_number,
+
+            customer_name,
+
+            customer_phone,
+
+            instructions,
+
+            payment_method,
+
+            json.dumps(
+                items,
+                ensure_ascii=False
+            ),
+
+            total,
+
+            "NEW",
+
+            created_at
+
+        ))
+
+
+        # ----------------------------------------------------
+        # COMMIT
+        # ----------------------------------------------------
+
+        conn.commit()
+
+
+        order_id = cursor.lastrowid
+
+
+        conn.close()
+
+
+        # ----------------------------------------------------
+        # RESPONSE
+        # ----------------------------------------------------
+
         return jsonify({
-            "success": False,
-            "message": "Invalid order data."
-        }), 400
+
+            "success": True,
+
+            "order_id": order_id,
+
+            "status": "NEW",
+
+            "message": "Order placed successfully."
+
+        }), 200
 
 
-    # CHECK CART
+    except Exception as e:
 
-    if not data.get("items"):
+        print(
+            f"PLACE ORDER ERROR: {e}"
+        )
+
+
         return jsonify({
+
             "success": False,
-            "message": "Cart is empty."
-        }), 400
+
+            "message": "Unable to place order.",
+
+            "error": str(e)
+
+        }), 500
 
 
-    # CHECK CUSTOMER NAME
+# ============================================================
+# ADMIN DASHBOARD
+# ============================================================
 
-    if not data.get("customer_name"):
-        return jsonify({
-            "success": False,
-            "message": "Customer name is required."
-        }), 400
-
-
-    # CONNECT TO DATABASE
+@app.route("/admin")
+def admin():
 
     conn = get_db_connection()
 
 
-    # SAVE ORDER
+    try:
 
-    cursor = conn.execute("""
-        INSERT INTO orders (
-            table_number,
-            customer_name,
-            customer_phone,
-            instructions,
-            payment_method,
-            items,
-            total,
-            created_at
+        # ----------------------------------------------------
+        # GET ALL ORDERS
+        # NEWEST FIRST
+        # ----------------------------------------------------
+
+        orders = conn.execute("""
+            SELECT *
+            FROM orders
+            ORDER BY id DESC
+        """).fetchall()
+
+
+        orders_data = []
+
+
+        # ----------------------------------------------------
+        # PROCESS ORDERS
+        # ----------------------------------------------------
+
+        for order in orders:
+
+            try:
+
+                items = json.loads(
+                    order["items"]
+                )
+
+                if not isinstance(
+                    items,
+                    list
+                ):
+
+                    items = []
+
+
+            except (
+                json.JSONDecodeError,
+                TypeError
+            ):
+
+                items = []
+
+
+            # ------------------------------------------------
+            # CLEAN ITEMS
+            # ------------------------------------------------
+
+            cleaned_items = []
+
+
+            for item in items:
+
+                if not isinstance(
+                    item,
+                    dict
+                ):
+
+                    continue
+
+
+                try:
+
+                    price = float(
+                        item.get(
+                            "price",
+                            0
+                        )
+                    )
+
+                except (
+                    ValueError,
+                    TypeError
+                ):
+
+                    price = 0
+
+
+                try:
+
+                    quantity = int(
+                        item.get(
+                            "quantity",
+                            1
+                        )
+                    )
+
+                except (
+                    ValueError,
+                    TypeError
+                ):
+
+                    quantity = 1
+
+
+                cleaned_items.append({
+
+                    "item_name": item.get(
+                        "item_name",
+                        item.get(
+                            "name",
+                            "Unknown Item"
+                        )
+                    ),
+
+                    "quantity": quantity,
+
+                    "price": price
+
+                })
+
+
+            # ------------------------------------------------
+            # ORDER DATA
+            # ------------------------------------------------
+
+            orders_data.append({
+
+                "order": {
+
+                    "id": order["id"],
+
+                    "table_no": (
+                        order["table_number"]
+                        or "Walk-in"
+                    ),
+
+                    "customer_name": (
+                        order["customer_name"]
+                        or ""
+                    ),
+
+                    "phone": (
+                        order["customer_phone"]
+                        or ""
+                    ),
+
+                    "instructions": (
+                        order["instructions"]
+                        or ""
+                    ),
+
+                    "payment_method": (
+                        order["payment_method"]
+                        or "Pay at Counter"
+                    ),
+
+                    "total": float(
+                        order["total"]
+                        or 0
+                    ),
+
+                    "status": (
+                        order["status"]
+                        or "NEW"
+                    ),
+
+                    "created_at": (
+                        order["created_at"]
+                        or ""
+                    )
+
+                },
+
+                "items": cleaned_items
+
+            })
+
+
+        return render_template(
+
+            "admin.html",
+
+            orders_data=orders_data
+
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-
-        data.get("table_number", ""),
-
-        data.get("customer_name", ""),
-
-        data.get("customer_phone", ""),
-
-        data.get("instructions", ""),
-
-        data.get(
-            "payment_method",
-            "Pay at Counter"
-        ),
-
-        json.dumps(
-            data.get("items", [])
-        ),
-
-        data.get("total", 0),
-
-        datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-
-    ))
 
 
-    # SAVE CHANGES
+    finally:
 
-    conn.commit()
-
-
-    # GET ORDER ID
-
-    order_id = cursor.lastrowid
+        conn.close()
 
 
-    # CLOSE DATABASE
+# ============================================================
+# ADMIN ORDERS API
+# USED FOR LIVE REFRESH
+# ============================================================
 
-    conn.close()
+@app.route(
+    "/api/orders",
+    methods=["GET"]
+)
+def api_orders():
+
+    conn = get_db_connection()
 
 
-    # SEND RESPONSE
+    try:
 
-    return jsonify({
-        "success": True,
-        "order_id": order_id,
-        "message": "Order placed successfully."
-    })
+        orders = conn.execute("""
+            SELECT *
+            FROM orders
+            ORDER BY id DESC
+        """).fetchall()
 
 
-# ============================================
+        result = []
+
+
+        for order in orders:
+
+            try:
+
+                items = json.loads(
+                    order["items"]
+                )
+
+                if not isinstance(
+                    items,
+                    list
+                ):
+
+                    items = []
+
+
+            except (
+                json.JSONDecodeError,
+                TypeError
+            ):
+
+                items = []
+
+
+            cleaned_items = []
+
+
+            for item in items:
+
+                if not isinstance(
+                    item,
+                    dict
+                ):
+
+                    continue
+
+
+                try:
+
+                    price = float(
+                        item.get(
+                            "price",
+                            0
+                        )
+                    )
+
+                except (
+                    ValueError,
+                    TypeError
+                ):
+
+                    price = 0
+
+
+                try:
+
+                    quantity = int(
+                        item.get(
+                            "quantity",
+                            1
+                        )
+                    )
+
+                except (
+                    ValueError,
+                    TypeError
+                ):
+
+                    quantity = 1
+
+
+                cleaned_items.append({
+
+                    "item_name": item.get(
+                        "item_name",
+                        item.get(
+                            "name",
+                            "Unknown Item"
+                        )
+                    ),
+
+                    "quantity": quantity,
+
+                    "price": price
+
+                })
+
+
+            result.append({
+
+                "id": order["id"],
+
+                "table_number": (
+                    order["table_number"]
+                    or "Walk-in"
+                ),
+
+                "customer_name": (
+                    order["customer_name"]
+                    or ""
+                ),
+
+                "customer_phone": (
+                    order["customer_phone"]
+                    or ""
+                ),
+
+                "instructions": (
+                    order["instructions"]
+                    or ""
+                ),
+
+                "payment_method": (
+                    order["payment_method"]
+                    or "Pay at Counter"
+                ),
+
+                "items": cleaned_items,
+
+                "total": float(
+                    order["total"]
+                    or 0
+                ),
+
+                "status": (
+                    order["status"]
+                    or "NEW"
+                ),
+
+                "created_at": (
+                    order["created_at"]
+                    or ""
+                )
+
+            })
+
+
+        return jsonify({
+
+            "success": True,
+
+            "orders": result,
+
+            "count": len(result)
+
+        })
+
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# UPDATE ORDER STATUS
+# ============================================================
+
+@app.route(
+    "/update-status/<int:order_id>/<status>",
+    methods=["POST"]
+)
+def update_status(
+    order_id,
+    status
+):
+
+    # --------------------------------------------------------
+    # ALLOWED STATUSES
+    # --------------------------------------------------------
+
+    allowed_statuses = [
+
+        "NEW",
+
+        "PREPARING",
+
+        "READY",
+
+        "COMPLETED"
+
+    ]
+
+
+    # --------------------------------------------------------
+    # VALIDATE STATUS
+    # --------------------------------------------------------
+
+    status = status.upper()
+
+
+    if status not in allowed_statuses:
+
+        return jsonify({
+
+            "success": False,
+
+            "message": "Invalid status."
+
+        }), 400
+
+
+    # --------------------------------------------------------
+    # UPDATE DATABASE
+    # --------------------------------------------------------
+
+    conn = get_db_connection()
+
+
+    try:
+
+        cursor = conn.execute("""
+
+            UPDATE orders
+
+            SET status = ?
+
+            WHERE id = ?
+
+        """, (
+
+            status,
+
+            order_id
+
+        ))
+
+
+        conn.commit()
+
+
+        # ----------------------------------------------------
+        # CHECK ORDER EXISTS
+        # ----------------------------------------------------
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": "Order not found."
+
+            }), 404
+
+
+        return jsonify({
+
+            "success": True,
+
+            "order_id": order_id,
+
+            "status": status,
+
+            "message": "Order status updated."
+
+        })
+
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# DELETE ORDER
+# OPTIONAL ADMIN FUNCTION
+# ============================================================
+
+@app.route(
+    "/delete-order/<int:order_id>",
+    methods=["POST"]
+)
+def delete_order(order_id):
+
+    conn = get_db_connection()
+
+
+    try:
+
+        cursor = conn.execute("""
+
+            DELETE FROM orders
+
+            WHERE id = ?
+
+        """, (
+
+            order_id,
+
+        ))
+
+
+        conn.commit()
+
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+
+                "success": False,
+
+                "message": "Order not found."
+
+            }), 404
+
+
+        return jsonify({
+
+            "success": True,
+
+            "message": "Order deleted."
+
+        })
+
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
 # RUN APPLICATION
-# ============================================
+# ============================================================
 
 if __name__ == "__main__":
 
-    init_db()
-
     app.run(
+
         host="0.0.0.0",
-        port=5000,
+
+        port=int(
+            os.environ.get(
+                "PORT",
+                5000
+            )
+        ),
+
         debug=True
+
     )
