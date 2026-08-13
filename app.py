@@ -171,6 +171,18 @@ def init_db():
 
 
         # ----------------------------------------------------
+        # ADD ORDER TIME COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "order_time" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN order_time TEXT DEFAULT 'Now'
+            """)
+
+
+        # ----------------------------------------------------
         # CREATE REVIEWS TABLE
         # ----------------------------------------------------
 
@@ -400,6 +412,14 @@ def place_order():
         )
 
 
+        order_time = str(
+            data.get(
+                "order_time",
+                "Now"
+            )
+        )
+
+
         # ----------------------------------------------------
         # TOTAL
         # ----------------------------------------------------
@@ -456,6 +476,8 @@ def place_order():
 
                 order_type,
 
+                order_time,
+
                 items,
 
                 total,
@@ -466,7 +488,7 @@ def place_order():
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
 
             table_number,
@@ -484,6 +506,8 @@ def place_order():
             map_link,
 
             order_type,
+
+            order_time,
 
             json.dumps(
                 items,
@@ -723,6 +747,12 @@ def admin():
                         else "Dine-in"
                     ) or "Dine-in",
 
+                    "order_time": (
+                        order["order_time"]
+                        if "order_time" in order.keys()
+                        else "Now"
+                    ) or "Now",
+
                     "total": float(
                         order["total"]
                         or 0
@@ -919,6 +949,12 @@ def api_orders():
                     if "order_type" in order.keys()
                     else "Dine-in"
                 ) or "Dine-in",
+
+                "order_time": (
+                    order["order_time"]
+                    if "order_time" in order.keys()
+                    else "Now"
+                ) or "Now",
 
                 "items": cleaned_items,
 
@@ -1450,7 +1486,7 @@ def order_status(order_id):
     try:
 
         order = conn.execute("""
-            SELECT id, status, created_at
+            SELECT id, status, order_time, created_at
             FROM orders
             WHERE id = ?
         """, (order_id,)).fetchone()
@@ -1466,11 +1502,51 @@ def order_status(order_id):
             "success": True,
             "order_id": order["id"],
             "status": order["status"] or "NEW",
+            "order_time": order["order_time"] if "order_time" in order.keys() else "",
             "created_at": order["created_at"] or ""
         })
 
     finally:
 
+        conn.close()
+
+
+# ============================================================
+# SET DELIVERY TIME (Admin)
+# ============================================================
+
+@app.route(
+    "/set-time/<int:order_id>/<time>",
+    methods=["POST"]
+)
+def set_delivery_time(order_id, time):
+
+    conn = get_db_connection()
+
+    try:
+
+        cursor = conn.execute("""
+            UPDATE orders
+            SET order_time = ?
+            WHERE id = ?
+        """, (time, order_id))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({
+                "success": False,
+                "message": "Order not found."
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "order_id": order_id,
+            "order_time": time,
+            "message": "Delivery time set."
+        })
+
+    finally:
         conn.close()
 
 

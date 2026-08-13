@@ -429,6 +429,23 @@
             color: white;
         }
 
+        .time-btn {
+            padding: 8px 14px;
+            background: #8e44ad;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .time-btn:hover {
+            background: #9b59b6;
+            transform: translateY(-2px);
+        }
+
 
         /* =========================================
            TOAST NOTIFICATION
@@ -795,6 +812,58 @@
         let allOrders = [];
         let activeFilter = "ALL";
         let refreshInterval = null;
+        let lastOrderCount = 0;
+
+
+        // =============================================
+        // NOTIFICATION SOUND
+        // =============================================
+
+        function playNotificationSound() {
+            // Create a beep sound using Web Audio API
+            try {
+                var ctx = new (window.AudioContext || window.webkitAudioContext)();
+                var oscillator = ctx.createOscillator();
+                var gain = ctx.createGain();
+
+                oscillator.connect(gain);
+                gain.connect(ctx.destination);
+
+                oscillator.type = "sine";
+                oscillator.frequency.value = 800;
+                gain.gain.value = 0.3;
+
+                oscillator.start();
+                oscillator.stop(ctx.currentTime + 0.3);
+
+                // Second beep
+                setTimeout(function() {
+                    var osc2 = ctx.createOscillator();
+                    var gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.type = "sine";
+                    osc2.frequency.value = 1000;
+                    gain2.gain.value = 0.3;
+                    osc2.start();
+                    osc2.stop(ctx.currentTime + 0.3);
+                }, 350);
+            } catch(e) {}
+        }
+
+        function showBrowserNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, {
+                    body: body,
+                    icon: "/static/images/icons/icon-192x192.png"
+                });
+            }
+        }
+
+        // Request notification permission on load
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
 
 
         // =============================================
@@ -842,6 +911,18 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Check for new orders
+                    if (lastOrderCount > 0 && data.orders.length > lastOrderCount) {
+                        var newCount = data.orders.length - lastOrderCount;
+                        playNotificationSound();
+                        showBrowserNotification(
+                            "🆕 New Order!",
+                            newCount + " new order(s) received"
+                        );
+                        showToast("🆕 " + newCount + " new order(s) received!");
+                    }
+                    lastOrderCount = data.orders.length;
+
                     allOrders = data.orders;
                     renderOrders();
                     updateFilterCounts();
@@ -985,7 +1066,17 @@
                     </button>
                 `;
 
-                actionsHTML = `<div class="actions">${buttons}</div>`;
+                // Delivery time buttons
+                let timeButtons = `
+                    <div class="time-actions" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+                        <button class="time-btn" data-order="${order.id}" data-time="10 min">⏰ 10m</button>
+                        <button class="time-btn" data-order="${order.id}" data-time="15 min">⏰ 15m</button>
+                        <button class="time-btn" data-order="${order.id}" data-time="20 min">⏰ 20m</button>
+                        <button class="time-btn" data-order="${order.id}" data-time="30 min">⏰ 30m</button>
+                    </div>
+                `;
+
+                actionsHTML = `<div class="actions">${buttons}</div>${timeButtons}`;
             }
 
             return `
@@ -999,6 +1090,7 @@
                     <div class="order-info">
                         <p><b>🪑 Table:</b> ${escapeHTML(order.table_number)}</p>
                         <p><b>🛍️ Type:</b> ${escapeHTML(order.order_type || 'Dine-in')}</p>
+                        <p><b>⏰ Time:</b> ${escapeHTML(order.order_time || 'Not set')}</p>
                         <p><b>👤 Customer:</b> ${escapeHTML(order.customer_name)}</p>
                         <p><b>📞 Phone:</b> ${escapeHTML(order.customer_phone)}</p>
                         <p><b>💳 Payment:</b> ${escapeHTML(order.payment_method)}</p>
@@ -1049,6 +1141,16 @@
                     if (confirm("Delete order #" + orderId + "?")) {
                         deleteOrder(orderId);
                     }
+                });
+            });
+
+            // Delivery time buttons
+            const timeBtns = document.querySelectorAll(".time-btn");
+            timeBtns.forEach(function(btn) {
+                btn.addEventListener("click", function() {
+                    const orderId = this.dataset.order;
+                    const time = this.dataset.time;
+                    setDeliveryTime(orderId, time);
                 });
             });
         }
@@ -1102,6 +1204,31 @@
                     fetchOrders();
                 } else {
                     showToast(data.message || "Failed to delete", "error");
+                }
+            } catch (error) {
+                showToast("Network error", "error");
+            }
+        }
+
+
+        // =============================================
+        // SET DELIVERY TIME (AJAX)
+        // =============================================
+
+        async function setDeliveryTime(orderId, time) {
+            try {
+                const response = await fetch(
+                    "/set-time/" + orderId + "/" + encodeURIComponent(time),
+                    { method: "POST" }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast("Order #" + orderId + " → Delivery: " + time);
+                    fetchOrders();
+                } else {
+                    showToast(data.message || "Failed", "error");
                 }
             } catch (error) {
                 showToast("Network error", "error");

@@ -21,6 +21,26 @@
     </title>
 
 
+    <!-- PWA META TAGS -->
+
+    <meta name="theme-color" content="#0b2b20">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AKFAA">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="AKFAA Coffee Shop">
+
+    <!-- PWA MANIFEST -->
+
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+    <!-- PWA ICONS (Apple) -->
+
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icons/icon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='images/icons/icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/icons/icon-192x192.png') }}">
+
+
     <!-- GOOGLE FONTS -->
 
     <link
@@ -103,46 +123,46 @@
             </div>
 
 
-            <!-- LANGUAGE TOGGLE -->
+            <!-- HEADER BUTTONS GROUP -->
 
-            <button
-                type="button"
-                class="lang-toggle-btn"
-                id="lang-toggle"
-                onclick="toggleLanguage()"
-                aria-label="Switch language"
-            >
-                عربي
-            </button>
+            <div class="header-buttons">
 
-
-            <!-- CART BUTTON -->
-
-            <button
-                type="button"
-                class="cart-button"
-                onclick="toggleMobileCart()"
-                aria-label="Open cart"
-            >
-
-                <span class="cart-icon">
-                    🛒
-                </span>
-
-
-                <span class="cart-button-text">
-                    Cart
-                </span>
-
-
-                <span
-                    id="mobile-cart-count"
-                    class="mobile-cart-count"
+                <button
+                    type="button"
+                    class="lang-toggle-btn"
+                    id="lang-toggle"
+                    onclick="toggleLanguage()"
+                    aria-label="Switch language"
                 >
-                    0
-                </span>
+                    عربي
+                </button>
 
-            </button>
+                <button
+                    type="button"
+                    class="install-app-btn"
+                    id="install-app-btn"
+                    style="display:none;"
+                    onclick="installPWA()"
+                >
+                    📲
+                </button>
+
+                <button
+                    type="button"
+                    class="cart-button"
+                    onclick="toggleMobileCart()"
+                    aria-label="Open cart"
+                >
+                    🛒
+                    <span
+                        id="mobile-cart-count"
+                        class="mobile-cart-count"
+                    >
+                        0
+                    </span>
+                </button>
+
+            </div>
 
 
         </header>
@@ -554,20 +574,38 @@
 
 
 
-        <!-- GOOGLE MAPS LINK (Optional) -->
+        <!-- GOOGLE MAPS LOCATION -->
 
         <div class="form-field">
 
-            <label for="customer-map-link">
-                Google Maps Link (Optional)
+            <label>
+                Location (Optional)
             </label>
 
-            <input
-                type="url"
-                id="customer-map-link"
-                placeholder="Paste your Google Maps location link"
-                autocomplete="off"
-            >
+            <div class="location-options">
+
+                <button
+                    type="button"
+                    class="location-auto-btn"
+                    id="get-location-btn"
+                    onclick="getAutoLocation()"
+                >
+                    📍 Use My Current Location
+                </button>
+
+                <span class="location-or">or</span>
+
+                <input
+                    type="url"
+                    id="customer-map-link"
+                    class="location-manual-input"
+                    placeholder="Paste Google Maps link manually"
+                    autocomplete="off"
+                >
+
+            </div>
+
+            <span class="location-status" id="location-status"></span>
 
         </div>
 
@@ -749,6 +787,7 @@
     <div class="tracking-header">
         <h2>Order Tracking</h2>
         <span class="tracking-order-id" id="tracking-order-id">Order #--</span>
+        <span class="tracking-time-info" id="tracking-time-info"></span>
     </div>
 
     <div class="tracking-body">
@@ -857,6 +896,59 @@
 <script
     src="{{ url_for('static', filename='js/script.js') }}"
 ></script>
+
+
+<!-- =====================================
+     SERVICE WORKER REGISTRATION
+     ===================================== -->
+
+<script>
+    // Service Worker Registration
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function() {
+            navigator.serviceWorker.register("/static/sw.js", { scope: "/" })
+                .then(function(reg) {
+                    console.log("[PWA] Service Worker registered:", reg.scope);
+                })
+                .catch(function(err) {
+                    console.log("[PWA] SW registration failed:", err);
+                });
+        });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Show install button
+        var btn = document.getElementById("install-app-btn");
+        if (btn) btn.style.display = "inline-flex";
+    });
+
+    function installPWA() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(result) {
+            if (result.outcome === "accepted") {
+                console.log("[PWA] App installed");
+            }
+            deferredPrompt = null;
+            var btn = document.getElementById("install-app-btn");
+            if (btn) btn.style.display = "none";
+        });
+    }
+
+    window.installPWA = installPWA;
+
+    // Hide install button if already installed
+    window.addEventListener("appinstalled", function() {
+        var btn = document.getElementById("install-app-btn");
+        if (btn) btn.style.display = "none";
+        deferredPrompt = null;
+    });
+</script>
 
 
 </body>

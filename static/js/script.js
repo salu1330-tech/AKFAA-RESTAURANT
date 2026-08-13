@@ -1372,6 +1372,7 @@ function changeQuantity(
 
 
     renderCart();
+    renderMenu();
 
 }
 
@@ -1404,6 +1405,7 @@ function removeCartItem(index) {
 
 
     renderCart();
+    renderMenu();
 
 }
 
@@ -2201,6 +2203,17 @@ async function pollOrderStatus(orderId) {
         if (data.success) {
             updateTrackingUI(data.status);
 
+            // Show delivery time if admin has set it
+            const timeInfo = document.getElementById("tracking-time-info");
+            if (timeInfo) {
+                if (data.order_time && data.order_time !== "Now" && data.order_time !== "") {
+                    timeInfo.textContent = "⏰ Delivery in: " + data.order_time;
+                    timeInfo.style.display = "block";
+                } else {
+                    timeInfo.style.display = "none";
+                }
+            }
+
             // Stop polling when completed
             if (data.status === "COMPLETED") {
                 if (trackingInterval) {
@@ -2560,6 +2573,80 @@ function openMenuPDF() {
 window.openMenuPDF = openMenuPDF;
 
 
+// ============================================
+// ORDER TIME
+// ============================================
+
+function getOrderTime() {
+    const select = document.getElementById("order-time");
+    if (!select) return "Now";
+
+    if (select.value === "custom") {
+        const customTime = document.getElementById("order-custom-time");
+        return customTime && customTime.value ? ("At " + customTime.value) : "Now";
+    }
+
+    return select.value;
+}
+
+// Toggle custom time input
+document.addEventListener("DOMContentLoaded", function() {
+    const select = document.getElementById("order-time");
+    const customInput = document.getElementById("order-custom-time");
+
+    if (select && customInput) {
+        select.addEventListener("change", function() {
+            customInput.style.display = this.value === "custom" ? "block" : "none";
+        });
+    }
+});
+
+
+// ============================================
+// AUTO LOCATION (GPS)
+// ============================================
+
+function getAutoLocation() {
+
+    const btn = document.getElementById("get-location-btn");
+    const status = document.getElementById("location-status");
+    const mapInput = document.getElementById("customer-map-link");
+
+    if (!navigator.geolocation) {
+        if (status) status.textContent = "Geolocation not supported by your browser";
+        return;
+    }
+
+    if (btn) btn.textContent = "📍 Getting location...";
+    if (status) status.textContent = "Detecting your location...";
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var mapLink = "https://www.google.com/maps?q=" + lat + "," + lng;
+
+            if (mapInput) mapInput.value = mapLink;
+            if (status) {
+                status.textContent = "✅ Location detected!";
+                status.style.color = "#27ae60";
+            }
+            if (btn) btn.textContent = "📍 Location Set ✓";
+        },
+        function(error) {
+            if (status) {
+                status.textContent = "Unable to get location. Please paste manually.";
+                status.style.color = "#e74c3c";
+            }
+            if (btn) btn.textContent = "📍 Use My Current Location";
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
+window.getAutoLocation = getAutoLocation;
+
+
 function generateMenuQR() {
 
     const container = document.getElementById("menu-qr-code");
@@ -2574,11 +2661,11 @@ function generateMenuQR() {
     if (typeof QRCode !== "undefined") {
         new QRCode(container, {
             text: pdfUrl,
-            width: 120,
-            height: 120,
+            width: 200,
+            height: 200,
             colorDark: "#0b2b20",
-            colorLight: "#f8f5ee",
-            correctLevel: QRCode.CorrectLevel.M
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
         });
     }
 }

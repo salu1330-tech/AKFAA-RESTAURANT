@@ -2899,21 +2899,25 @@ body.arabic-mode .cat-arabic {
 }
 
 .qr-label {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--muted);
-    margin: 0 0 10px;
-    font-weight: 600;
+    margin: 0 0 12px;
+    font-weight: 700;
 }
 
 .qr-code-box {
     display: inline-block;
-    padding: 10px;
-    background: #f8f5ee;
-    border-radius: 12px;
+    padding: 14px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .qr-code-box img {
     display: block;
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
 }
 
 
@@ -3009,4 +3013,208 @@ body.arabic-mode .cat-arabic {
 .t-star-input.active {
     color: #f5a623;
     transform: scale(1.15);
+}
+
+
+/* ==========================================
+   PWA INSTALL BUTTON
+   ========================================== */
+
+.install-app-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(39, 174, 96, 0.3);
+}
+
+.install-app-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(39, 174, 96, 0.4);
+}
+
+
+/* ==========================================
+   HEADER BUTTONS GROUP
+   ========================================== */
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-buttons .lang-toggle-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+.header-buttons .install-app-btn {
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+.header-buttons .cart-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    font-size: 18px;
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--text);
+}
+
+.header-buttons .cart-button:hover {
+    border-color: var(--gold);
+}
+
+.header-buttons .mobile-cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--gold);
+    color: var(--bg-dark);
+    font-size: 10px;
+    font-weight: 800;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* ==========================================
+   ORDER TIME SELECT
+   ========================================== */
+
+.order-time-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.order-time-select:focus {
+    border-color: var(--gold);
+}
+
+.order-time-select option {
+    background: #1a3a2d;
+    color: var(--text);
+}
+
+.order-custom-time {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    margin-top: 8px;
+    outline: none;
+}
+
+.order-custom-time:focus {
+    border-color: var(--gold);
+}
+
+
+/* ==========================================
+   LOCATION OPTIONS (Auto + Manual)
+   ========================================== */
+
+.location-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.location-auto-btn {
+    width: 100%;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #4285F4, #1a73e8);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.location-auto-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.location-or {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.location-manual-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+}
+
+.location-manual-input:focus {
+    border-color: var(--gold);
+}
+
+.location-manual-input::placeholder {
+    color: var(--muted);
+}
+
+.location-status {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* Tracking time info */
+.tracking-time-info {
+    display: block;
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-top: 4px;
 }
