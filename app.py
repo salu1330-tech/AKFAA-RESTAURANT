@@ -237,6 +237,28 @@ init_db()
 
 
 # ============================================================
+# SERVICE WORKER (serve from root for PWA scope)
+# ============================================================
+
+@app.route("/sw.js")
+def service_worker():
+    return send_from_directory(
+        os.path.join(BASE_DIR, "static"),
+        "sw.js",
+        mimetype="application/javascript"
+    )
+
+
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory(
+        os.path.join(BASE_DIR, "static"),
+        "manifest.json",
+        mimetype="application/manifest+json"
+    )
+
+
+# ============================================================
 # HOME PAGE
 # ============================================================
 
