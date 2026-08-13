@@ -2,7 +2,7 @@
 // AKFAA COFFEE SHOP - SERVICE WORKER
 // ============================================
 
-const CACHE_NAME = "akfaa-v1";
+const CACHE_NAME = "akfaa-v2";
 
 const STATIC_ASSETS = [
     "/",
@@ -10,7 +10,8 @@ const STATIC_ASSETS = [
     "/static/js/menu-data.js",
     "/static/js/script.js",
     "/static/images/logo.png",
-    "/static/manifest.json"
+    "/static/manifest.json",
+    "/menu-pdf"
 ];
 
 // ============================================
@@ -57,16 +58,17 @@ self.addEventListener("fetch", function(event) {
     if (event.request.url.includes("/api/") ||
         event.request.url.includes("/place-order") ||
         event.request.url.includes("/update-status") ||
-        event.request.url.includes("/delete-order")) {
+        event.request.url.includes("/delete-order") ||
+        event.request.url.includes("/set-time")) {
         return;
     }
 
-    event.waitUntil = event.respondWith(
+    event.respondWith(
         fetch(event.request)
             .then(function(response) {
                 // Cache successful responses
                 if (response.status === 200) {
-                    const responseClone = response.clone();
+                    var responseClone = response.clone();
                     caches.open(CACHE_NAME).then(function(cache) {
                         cache.put(event.request, responseClone);
                     });
