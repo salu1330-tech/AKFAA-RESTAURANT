@@ -2411,25 +2411,18 @@ function setupStarInput() {
 
     stars.forEach(function(star) {
 
-        star.addEventListener("click", function() {
+        star.addEventListener("click", function(e) {
+            e.preventDefault();
             selectedRating = parseInt(this.dataset.star);
             updateStarDisplay();
         });
 
-        star.addEventListener("mouseenter", function() {
-            const hoverVal = parseInt(this.dataset.star);
-            stars.forEach(function(s, i) {
-                s.classList.toggle("active", i < hoverVal);
-            });
-        });
-    });
-
-    const container = document.getElementById("review-stars-input");
-    if (container) {
-        container.addEventListener("mouseleave", function() {
+        star.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            selectedRating = parseInt(this.dataset.star);
             updateStarDisplay();
         });
-    }
+    });
 
     // Close on overlay click
     const overlay = document.getElementById("reviews-modal-overlay");
@@ -2682,30 +2675,22 @@ function setupTrackingReviewStars() {
     const stars = document.querySelectorAll(".t-star-input");
 
     stars.forEach(function(star) {
-        star.addEventListener("click", function() {
+        star.addEventListener("click", function(e) {
+            e.preventDefault();
             trackingRating = parseInt(this.dataset.star);
             stars.forEach(function(s, i) {
                 s.classList.toggle("active", i < trackingRating);
             });
         });
 
-        star.addEventListener("mouseenter", function() {
-            const hoverVal = parseInt(this.dataset.star);
+        star.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            trackingRating = parseInt(this.dataset.star);
             stars.forEach(function(s, i) {
-                s.classList.toggle("active", i < hoverVal);
-            });
-        });
-    });
-
-    const container = document.getElementById("tracking-review-stars");
-    if (container) {
-        container.addEventListener("mouseleave", function() {
-            const stars2 = document.querySelectorAll(".t-star-input");
-            stars2.forEach(function(s, i) {
                 s.classList.toggle("active", i < trackingRating);
             });
         });
-    }
+    });
 }
 
 async function submitTrackingReview() {

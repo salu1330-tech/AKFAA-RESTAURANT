@@ -2759,11 +2759,13 @@ body.arabic-mode .cat-arabic {
 }
 
 .star-input {
-    font-size: 28px;
+    font-size: 36px;
     color: rgba(255, 255, 255, 0.15);
     cursor: pointer;
     transition: 0.15s;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 4px;
 }
 
 .star-input:hover,
@@ -3002,11 +3004,13 @@ body.arabic-mode .cat-arabic {
 }
 
 .t-star-input {
-    font-size: 30px;
+    font-size: 36px;
     color: rgba(255, 255, 255, 0.15);
     cursor: pointer;
     transition: 0.15s;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 4px;
 }
 
 .t-star-input:hover,

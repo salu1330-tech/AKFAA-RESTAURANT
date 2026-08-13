@@ -141,7 +141,6 @@
                     type="button"
                     class="install-app-btn"
                     id="install-app-btn"
-                    style="display:none;"
                     onclick="installPWA()"
                 >
                     📲
@@ -922,32 +921,47 @@
     window.addEventListener("beforeinstallprompt", function(e) {
         e.preventDefault();
         deferredPrompt = e;
-        // Show install button
-        var btn = document.getElementById("install-app-btn");
-        if (btn) btn.style.display = "inline-flex";
     });
 
     function installPWA() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(result) {
-            if (result.outcome === "accepted") {
-                console.log("[PWA] App installed");
-            }
-            deferredPrompt = null;
-            var btn = document.getElementById("install-app-btn");
-            if (btn) btn.style.display = "none";
-        });
+        // If native install prompt is available
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function(result) {
+                if (result.outcome === "accepted") {
+                    console.log("[PWA] App installed");
+                }
+                deferredPrompt = null;
+            });
+            return;
+        }
+
+        // Check if already in standalone mode
+        if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+            alert("App is already installed!");
+            return;
+        }
+
+        // Show manual instructions
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        var isAndroid = /Android/.test(navigator.userAgent);
+
+        if (isIOS) {
+            alert("To install this app:\n\n1. Tap the Share button (bottom bar)\n2. Scroll down and tap 'Add to Home Screen'\n3. Tap 'Add'");
+        } else if (isAndroid) {
+            alert("To install this app:\n\n1. Tap the menu (⋮) in your browser\n2. Tap 'Add to Home Screen' or 'Install App'\n3. Tap 'Add'");
+        } else {
+            alert("To install this app:\n\n1. Open browser menu\n2. Look for 'Install' or 'Add to Home Screen'\n3. Follow the prompts");
+        }
     }
 
     window.installPWA = installPWA;
 
-    // Hide install button if already installed
-    window.addEventListener("appinstalled", function() {
+    // Hide if already installed as standalone
+    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
         var btn = document.getElementById("install-app-btn");
         if (btn) btn.style.display = "none";
-        deferredPrompt = null;
-    });
+    }
 </script>
 
 
