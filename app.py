@@ -159,6 +159,18 @@ def init_db():
 
 
         # ----------------------------------------------------
+        # ADD ORDER TYPE COLUMN IF OLD DATABASE
+        # ----------------------------------------------------
+
+        if "order_type" not in columns:
+
+            conn.execute("""
+                ALTER TABLE orders
+                ADD COLUMN order_type TEXT DEFAULT 'Dine-in'
+            """)
+
+
+        # ----------------------------------------------------
         # CREATE REVIEWS TABLE
         # ----------------------------------------------------
 
@@ -380,6 +392,14 @@ def place_order():
         )
 
 
+        order_type = str(
+            data.get(
+                "order_type",
+                "Dine-in"
+            )
+        )
+
+
         # ----------------------------------------------------
         # TOTAL
         # ----------------------------------------------------
@@ -434,6 +454,8 @@ def place_order():
 
                 map_link,
 
+                order_type,
+
                 items,
 
                 total,
@@ -444,7 +466,7 @@ def place_order():
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
 
             table_number,
@@ -460,6 +482,8 @@ def place_order():
             address,
 
             map_link,
+
+            order_type,
 
             json.dumps(
                 items,
@@ -693,6 +717,12 @@ def admin():
                         else ""
                     ) or "",
 
+                    "order_type": (
+                        order["order_type"]
+                        if "order_type" in order.keys()
+                        else "Dine-in"
+                    ) or "Dine-in",
+
                     "total": float(
                         order["total"]
                         or 0
@@ -883,6 +913,12 @@ def api_orders():
                     if "map_link" in order.keys()
                     else ""
                 ) or "",
+
+                "order_type": (
+                    order["order_type"]
+                    if "order_type" in order.keys()
+                    else "Dine-in"
+                ) or "Dine-in",
 
                 "items": cleaned_items,
 
@@ -1191,6 +1227,208 @@ def get_reviews():
             "reviews": result,
             "count": len(result),
             "average": avg_rating
+        })
+
+    finally:
+        conn.close()
+
+
+# ============================================================
+# SALES REPORTS API
+# ============================================================
+
+@app.route("/api/reports", methods=["GET"])
+def api_reports():
+
+    conn = get_db_connection()
+
+    try:
+
+        # --------------------------------------------------
+        # TOTAL STATS
+        # --------------------------------------------------
+
+        total_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders"
+        ).fetchone()["c"]
+
+        total_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders"
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # TODAY
+        # --------------------------------------------------
+
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        today_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders WHERE created_at LIKE ?",
+            (today + "%",)
+        ).fetchone()["c"]
+
+        today_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at LIKE ?",
+            (today + "%",)
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # THIS WEEK (last 7 days)
+        # --------------------------------------------------
+
+        from datetime import timedelta
+
+        week_start = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+
+        week_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders WHERE created_at >= ?",
+            (week_start,)
+        ).fetchone()["c"]
+
+        week_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at >= ?",
+            (week_start,)
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # THIS MONTH
+        # --------------------------------------------------
+
+        month_start = datetime.now().strftime("%Y-%m") + "-01"
+
+        month_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders WHERE created_at >= ?",
+            (month_start,)
+        ).fetchone()["c"]
+
+        month_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at >= ?",
+            (month_start,)
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # THIS QUARTER (last 3 months)
+        # --------------------------------------------------
+
+        quarter_start = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+
+        quarter_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders WHERE created_at >= ?",
+            (quarter_start,)
+        ).fetchone()["c"]
+
+        quarter_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at >= ?",
+            (quarter_start,)
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # THIS YEAR
+        # --------------------------------------------------
+
+        year_start = datetime.now().strftime("%Y") + "-01-01"
+
+        year_orders = conn.execute(
+            "SELECT COUNT(*) as c FROM orders WHERE created_at >= ?",
+            (year_start,)
+        ).fetchone()["c"]
+
+        year_revenue = conn.execute(
+            "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at >= ?",
+            (year_start,)
+        ).fetchone()["s"]
+
+        # --------------------------------------------------
+        # TOP SELLING ITEMS
+        # --------------------------------------------------
+
+        all_orders = conn.execute(
+            "SELECT items FROM orders"
+        ).fetchall()
+
+        item_counts = {}
+
+        for order in all_orders:
+            try:
+                items = json.loads(order["items"])
+                if not isinstance(items, list):
+                    continue
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    name = item.get("name", item.get("item_name", "Unknown"))
+                    qty = int(item.get("quantity", 1))
+                    item_counts[name] = item_counts.get(name, 0) + qty
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+        top_items = sorted(
+            item_counts.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:15]
+
+        # --------------------------------------------------
+        # ORDER STATUS BREAKDOWN
+        # --------------------------------------------------
+
+        status_counts = {}
+        statuses = conn.execute(
+            "SELECT status, COUNT(*) as c FROM orders GROUP BY status"
+        ).fetchall()
+
+        for s in statuses:
+            status_counts[s["status"] or "NEW"] = s["c"]
+
+        # --------------------------------------------------
+        # ORDER TYPE BREAKDOWN
+        # --------------------------------------------------
+
+        type_counts = {}
+        try:
+            types = conn.execute(
+                "SELECT order_type, COUNT(*) as c FROM orders GROUP BY order_type"
+            ).fetchall()
+            for t in types:
+                type_counts[t["order_type"] or "Dine-in"] = t["c"]
+        except Exception:
+            type_counts = {"Dine-in": total_orders}
+
+        # --------------------------------------------------
+        # DAILY REVENUE (last 7 days)
+        # --------------------------------------------------
+
+        daily_revenue = []
+        for i in range(6, -1, -1):
+            day = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+            day_rev = conn.execute(
+                "SELECT COALESCE(SUM(total), 0) as s FROM orders WHERE created_at LIKE ?",
+                (day + "%",)
+            ).fetchone()["s"]
+            daily_revenue.append({
+                "date": day,
+                "revenue": round(day_rev, 3)
+            })
+
+        # --------------------------------------------------
+        # RESPONSE
+        # --------------------------------------------------
+
+        return jsonify({
+            "success": True,
+            "summary": {
+                "total_orders": total_orders,
+                "total_revenue": round(total_revenue, 3),
+                "today": {"orders": today_orders, "revenue": round(today_revenue, 3)},
+                "week": {"orders": week_orders, "revenue": round(week_revenue, 3)},
+                "month": {"orders": month_orders, "revenue": round(month_revenue, 3)},
+                "quarter": {"orders": quarter_orders, "revenue": round(quarter_revenue, 3)},
+                "year": {"orders": year_orders, "revenue": round(year_revenue, 3)}
+            },
+            "top_items": [{"name": name, "quantity": qty} for name, qty in top_items],
+            "status_breakdown": status_counts,
+            "type_breakdown": type_counts,
+            "daily_revenue": daily_revenue
         })
 
     finally:

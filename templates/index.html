@@ -185,6 +185,15 @@
 
             <button
                 type="button"
+                class="menu-pdf-btn"
+                id="menu-pdf-btn"
+                onclick="openMenuPDF()"
+            >
+                📄 Menu PDF
+            </button>
+
+            <button
+                type="button"
                 class="reviews-btn"
                 id="open-reviews-btn"
                 onclick="openReviewsModal()"
@@ -269,6 +278,12 @@
                     >
                         🗺️ View on Map
                     </a>
+
+                    <!-- QR CODE FOR MENU PDF -->
+                    <div class="qr-code-section">
+                        <p class="qr-label">Scan for Full Menu</p>
+                        <div id="menu-qr-code" class="qr-code-box"></div>
+                    </div>
 
                 </div>
 
@@ -406,6 +421,41 @@
             <strong id="cart-total-price">
                 OMR 0.000
             </strong>
+
+        </div>
+
+
+
+        <!-- ORDER TYPE: Dine-in / Takeaway -->
+
+        <div class="order-type-section">
+
+            <span class="order-type-title">
+                Order Type
+            </span>
+
+            <div class="order-type-options">
+
+                <label class="order-type-option">
+                    <input
+                        type="radio"
+                        name="order-type"
+                        value="Dine-in"
+                        checked
+                    >
+                    <span class="order-type-label">🍽️ Dine-in</span>
+                </label>
+
+                <label class="order-type-option">
+                    <input
+                        type="radio"
+                        name="order-type"
+                        value="Takeaway"
+                    >
+                    <span class="order-type-label">🛍️ Takeaway</span>
+                </label>
+
+            </div>
 
         </div>
 
@@ -751,7 +801,42 @@
         <p class="refresh-note">Powered by AKFAA Coffee Shop</p>
     </div>
 
+    <!-- REVIEW AFTER DELIVERY -->
+    <div class="tracking-review" id="tracking-review-section" style="display:none;">
+        <div class="tracking-review-card">
+            <h4>How was your food? ⭐</h4>
+            <div class="tracking-review-stars" id="tracking-review-stars">
+                <span class="t-star-input" data-star="1">★</span>
+                <span class="t-star-input" data-star="2">★</span>
+                <span class="t-star-input" data-star="3">★</span>
+                <span class="t-star-input" data-star="4">★</span>
+                <span class="t-star-input" data-star="5">★</span>
+            </div>
+            <textarea
+                id="tracking-review-comment"
+                class="review-input review-textarea"
+                placeholder="Tell us about your experience..."
+                rows="2"
+            ></textarea>
+            <button
+                type="button"
+                class="review-submit-btn"
+                id="tracking-review-submit"
+                onclick="submitTrackingReview()"
+            >
+                Submit Review
+            </button>
+        </div>
+    </div>
+
 </div>
+
+
+<!-- =====================================
+     QR CODE LIBRARY
+     ===================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 
 <!-- =====================================

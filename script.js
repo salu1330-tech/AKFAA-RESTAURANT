@@ -123,6 +123,8 @@ function initializeApplication() {
 
     initReviews();
 
+    generateMenuQR();
+
 }
 
 
@@ -136,7 +138,7 @@ function toggleLanguage() {
 
     const btn = document.getElementById("lang-toggle");
     if (btn) {
-        btn.textContent = currentLang === "en" ? "عربي" : "عربي";
+        btn.textContent = currentLang === "ar" ? "English" : "عربي";
     }
 
     // Toggle body direction
@@ -265,6 +267,14 @@ function updateUILanguage() {
     // Reviews button
     const reviewsBtn = document.getElementById("open-reviews-btn");
     if (reviewsBtn) reviewsBtn.textContent = isAr ? "⭐ التقييمات" : "⭐ Reviews";
+
+    // PDF button
+    const pdfBtn = document.getElementById("menu-pdf-btn");
+    if (pdfBtn) pdfBtn.textContent = isAr ? "📄 القائمة PDF" : "📄 Menu PDF";
+
+    // QR label
+    const qrLabel = document.querySelector(".qr-label");
+    if (qrLabel) qrLabel.textContent = isAr ? "امسح للقائمة الكاملة" : "Scan for Full Menu";
 
     // Total label
     const totalLabel = document.querySelector(".total-row span");
@@ -1749,6 +1759,9 @@ async function placeOrder() {
         instructions:
             instructions,
 
+        order_type:
+            (document.querySelector('input[name="order-type"]:checked') || {}).value || "Dine-in",
+
         address:
             document
                 .getElementById("customer-address")
@@ -2143,6 +2156,9 @@ function openOrderTracking(orderId) {
 
     overlay.onclick = closeOrderTracking;
 
+    // Setup review stars in tracking modal
+    setupTrackingReviewStars();
+
     // Show the Track Order button
     const trackBtn = document.getElementById("track-order-button");
     if (trackBtn) {
@@ -2231,6 +2247,12 @@ function updateTrackingUI(currentStatus) {
 
     if (emoji) emoji.textContent = msg.emoji;
     if (message) message.textContent = msg.text;
+
+    // Show review form when completed
+    const reviewSection = document.getElementById("tracking-review-section");
+    if (reviewSection) {
+        reviewSection.style.display = currentStatus === "COMPLETED" ? "block" : "none";
+    }
 }
 
 
@@ -2525,3 +2547,124 @@ function renderStars(rating) {
 
     return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
 }
+
+
+// ============================================
+// MENU PDF
+// ============================================
+
+function openMenuPDF() {
+    window.open("/menu-pdf", "_blank");
+}
+
+window.openMenuPDF = openMenuPDF;
+
+
+function generateMenuQR() {
+
+    const container = document.getElementById("menu-qr-code");
+    if (!container) return;
+
+    // Use current origin for the PDF URL
+    const pdfUrl = window.location.origin + "/menu-pdf";
+
+    // Clear any existing QR
+    container.innerHTML = "";
+
+    if (typeof QRCode !== "undefined") {
+        new QRCode(container, {
+            text: pdfUrl,
+            width: 120,
+            height: 120,
+            colorDark: "#0b2b20",
+            colorLight: "#f8f5ee",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }
+}
+
+
+// ============================================
+// TRACKING REVIEW (after delivery)
+// ============================================
+
+let trackingRating = 0;
+
+function setupTrackingReviewStars() {
+
+    const stars = document.querySelectorAll(".t-star-input");
+
+    stars.forEach(function(star) {
+        star.addEventListener("click", function() {
+            trackingRating = parseInt(this.dataset.star);
+            stars.forEach(function(s, i) {
+                s.classList.toggle("active", i < trackingRating);
+            });
+        });
+
+        star.addEventListener("mouseenter", function() {
+            const hoverVal = parseInt(this.dataset.star);
+            stars.forEach(function(s, i) {
+                s.classList.toggle("active", i < hoverVal);
+            });
+        });
+    });
+
+    const container = document.getElementById("tracking-review-stars");
+    if (container) {
+        container.addEventListener("mouseleave", function() {
+            const stars2 = document.querySelectorAll(".t-star-input");
+            stars2.forEach(function(s, i) {
+                s.classList.toggle("active", i < trackingRating);
+            });
+        });
+    }
+}
+
+async function submitTrackingReview() {
+
+    const comment = (document.getElementById("tracking-review-comment") || {}).value || "";
+    const btn = document.getElementById("tracking-review-submit");
+
+    if (trackingRating === 0) {
+        showOrderMessage(currentLang === "ar" ? "اختر التقييم" : "Please select a rating", "error");
+        return;
+    }
+
+    // Use the customer name from the last order if available
+    const customerName = document.getElementById("customer-name")?.value?.trim() || "Customer";
+
+    btn.disabled = true;
+    btn.textContent = "...";
+
+    try {
+        const response = await fetch("/api/reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                customer_name: customerName,
+                rating: trackingRating,
+                comment: comment
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showOrderMessage(currentLang === "ar" ? "شكراً لتقييمك!" : "Thank you for your review!", "success");
+            document.getElementById("tracking-review-section").innerHTML =
+                '<p style="text-align:center;color:var(--gold);padding:20px;font-weight:700;">✅ ' +
+                (currentLang === "ar" ? "شكراً لتقييمك!" : "Review submitted. Thank you!") + '</p>';
+        } else {
+            showOrderMessage(data.message || "Error", "error");
+            btn.disabled = false;
+            btn.textContent = currentLang === "ar" ? "إرسال التقييم" : "Submit Review";
+        }
+    } catch (e) {
+        showOrderMessage("Network error", "error");
+        btn.disabled = false;
+        btn.textContent = currentLang === "ar" ? "إرسال التقييم" : "Submit Review";
+    }
+}
+
+window.submitTrackingReview = submitTrackingReview;

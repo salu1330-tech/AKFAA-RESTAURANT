@@ -2864,3 +2864,149 @@ body.arabic-mode .cat-arabic {
     min-width: 18px;
     text-align: center;
 }
+
+
+/* ==========================================
+   MENU PDF BUTTON
+   ========================================== */
+
+.menu-pdf-btn {
+    padding: 10px 16px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.menu-pdf-btn:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+/* ==========================================
+   QR CODE SECTION
+   ========================================== */
+
+.qr-code-section {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.qr-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 10px;
+    font-weight: 600;
+}
+
+.qr-code-box {
+    display: inline-block;
+    padding: 10px;
+    background: #f8f5ee;
+    border-radius: 12px;
+}
+
+.qr-code-box img {
+    display: block;
+}
+
+
+/* ==========================================
+   ORDER TYPE (Dine-in / Takeaway)
+   ========================================== */
+
+.order-type-section {
+    margin-bottom: 14px;
+}
+
+.order-type-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.order-type-options {
+    display: flex;
+    gap: 8px;
+}
+
+.order-type-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.order-type-option input {
+    display: none;
+}
+
+.order-type-label {
+    display: block;
+    text-align: center;
+    padding: 12px 10px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: 0.2s;
+}
+
+.order-type-option input:checked + .order-type-label {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(216, 182, 71, 0.08);
+}
+
+
+/* ==========================================
+   TRACKING REVIEW (After Delivery)
+   ========================================== */
+
+.tracking-review {
+    padding: 0 24px 24px;
+}
+
+.tracking-review-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+}
+
+.tracking-review-card h4 {
+    margin: 0 0 12px;
+    color: var(--gold);
+    font-size: 15px;
+}
+
+.tracking-review-stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.t-star-input {
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: 0.15s;
+    user-select: none;
+}
+
+.t-star-input:hover,
+.t-star-input.active {
+    color: #f5a623;
+    transform: scale(1.15);
+}

@@ -515,6 +515,184 @@
 
         }
 
+        /* =========================================
+           REPORTS STYLES
+           ========================================= */
+
+        .report-tab {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .report-tab.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .reports-container {
+            grid-column: 1 / -1;
+        }
+
+        .report-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .report-card {
+            background: var(--card-green);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .report-card-label {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .report-card-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .report-card-sub {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .report-section {
+            background: var(--card-green);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .report-section h3 {
+            color: var(--gold);
+            margin: 0 0 16px;
+            font-size: 16px;
+        }
+
+        .top-items-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .top-items-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .top-items-list li:last-child {
+            border-bottom: none;
+        }
+
+        .top-item-rank {
+            width: 28px;
+            height: 28px;
+            background: var(--gold);
+            color: #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .top-item-name {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .top-item-qty {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .chart-bar-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 120px;
+            padding-top: 10px;
+        }
+
+        .chart-bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 40px;
+            background: linear-gradient(to top, var(--gold), #f5d76e);
+            border-radius: 6px 6px 0 0;
+            min-height: 4px;
+            transition: 0.3s;
+        }
+
+        .chart-bar-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        .chart-bar-value {
+            font-size: 10px;
+            color: var(--gold);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .breakdown-item {
+            text-align: center;
+            padding: 14px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+        }
+
+        .breakdown-item .b-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .breakdown-item .b-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+        }
+
     </style>
 
 </head>
@@ -570,6 +748,9 @@
         </button>
         <button class="filter-tab" data-filter="COMPLETED">
             Completed
+        </button>
+        <button class="filter-tab report-tab" data-filter="REPORTS">
+            📊 Reports
         </button>
     </div>
 
@@ -715,6 +896,12 @@
         function renderOrders() {
             const container = document.getElementById("orders-container");
 
+            // Show reports view
+            if (activeFilter === "REPORTS") {
+                fetchReports();
+                return;
+            }
+
             const filtered = activeFilter === "ALL"
                 ? allOrders
                 : allOrders.filter(function(o) { return o.status === activeFilter; });
@@ -811,6 +998,7 @@
 
                     <div class="order-info">
                         <p><b>🪑 Table:</b> ${escapeHTML(order.table_number)}</p>
+                        <p><b>🛍️ Type:</b> ${escapeHTML(order.order_type || 'Dine-in')}</p>
                         <p><b>👤 Customer:</b> ${escapeHTML(order.customer_name)}</p>
                         <p><b>📞 Phone:</b> ${escapeHTML(order.customer_phone)}</p>
                         <p><b>💳 Payment:</b> ${escapeHTML(order.payment_method)}</p>
@@ -952,6 +1140,146 @@
             const div = document.createElement("div");
             div.textContent = String(str);
             return div.innerHTML;
+        }
+
+
+        // =============================================
+        // REPORTS
+        // =============================================
+
+        async function fetchReports() {
+            const container = document.getElementById("orders-container");
+            container.innerHTML = '<div class="no-orders"><h2>Loading reports...</h2></div>';
+
+            try {
+                const response = await fetch("/api/reports");
+                const data = await response.json();
+
+                if (data.success) {
+                    renderReports(data);
+                } else {
+                    container.innerHTML = '<div class="no-orders"><h2>Failed to load reports</h2></div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="no-orders"><h2>Network error</h2></div>';
+            }
+        }
+
+        function renderReports(data) {
+            const container = document.getElementById("orders-container");
+            const s = data.summary;
+
+            // Revenue cards
+            const cardsHTML = `
+                <div class="report-cards">
+                    <div class="report-card">
+                        <div class="report-card-label">Today</div>
+                        <div class="report-card-value">OMR ${s.today.revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.today.orders} orders</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-label">This Week</div>
+                        <div class="report-card-value">OMR ${s.week.revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.week.orders} orders</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-label">This Month</div>
+                        <div class="report-card-value">OMR ${s.month.revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.month.orders} orders</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-label">This Quarter</div>
+                        <div class="report-card-value">OMR ${s.quarter.revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.quarter.orders} orders</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-label">This Year</div>
+                        <div class="report-card-value">OMR ${s.year.revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.year.orders} orders</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="report-card-label">All Time</div>
+                        <div class="report-card-value">OMR ${s.total_revenue.toFixed(3)}</div>
+                        <div class="report-card-sub">${s.total_orders} total orders</div>
+                    </div>
+                </div>
+            `;
+
+            // Daily revenue chart
+            const maxRev = Math.max(...data.daily_revenue.map(function(d) { return d.revenue; }), 0.001);
+            const chartHTML = `
+                <div class="report-section">
+                    <h3>📈 Last 7 Days Revenue</h3>
+                    <div class="chart-bar-container">
+                        ${data.daily_revenue.map(function(d) {
+                            const height = Math.max((d.revenue / maxRev) * 100, 3);
+                            const dayName = new Date(d.date).toLocaleDateString('en', {weekday: 'short'});
+                            return '<div class="chart-bar-item">' +
+                                '<span class="chart-bar-value">' + d.revenue.toFixed(3) + '</span>' +
+                                '<div class="chart-bar" style="height:' + height + '%"></div>' +
+                                '<span class="chart-bar-label">' + dayName + '</span>' +
+                            '</div>';
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+
+            // Top selling items
+            const topItemsHTML = `
+                <div class="report-section">
+                    <h3>🔥 Top Selling Items (Most Demand)</h3>
+                    <ul class="top-items-list">
+                        ${data.top_items.map(function(item, i) {
+                            return '<li>' +
+                                '<span class="top-item-rank">' + (i + 1) + '</span>' +
+                                '<span class="top-item-name">' + escapeHTML(item.name) + '</span>' +
+                                '<span class="top-item-qty">' + item.quantity + ' sold</span>' +
+                            '</li>';
+                        }).join("")}
+                    </ul>
+                    ${data.top_items.length === 0 ? '<p style="color:#888;text-align:center;">No sales data yet</p>' : ''}
+                </div>
+            `;
+
+            // Order type breakdown
+            const typeHTML = `
+                <div class="report-section">
+                    <h3>🛍️ Order Type Breakdown</h3>
+                    <div class="breakdown-grid">
+                        ${Object.entries(data.type_breakdown).map(function(entry) {
+                            return '<div class="breakdown-item">' +
+                                '<div class="b-label">' + escapeHTML(entry[0]) + '</div>' +
+                                '<div class="b-value">' + entry[1] + '</div>' +
+                            '</div>';
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+
+            // Status breakdown
+            const statusHTML = `
+                <div class="report-section">
+                    <h3>📋 Order Status Breakdown</h3>
+                    <div class="breakdown-grid">
+                        ${Object.entries(data.status_breakdown).map(function(entry) {
+                            return '<div class="breakdown-item">' +
+                                '<div class="b-label">' + escapeHTML(entry[0]) + '</div>' +
+                                '<div class="b-value">' + entry[1] + '</div>' +
+                            '</div>';
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = `
+                <div class="reports-container">
+                    ${cardsHTML}
+                    ${chartHTML}
+                    ${topItemsHTML}
+                    ${typeHTML}
+                    ${statusHTML}
+                </div>
+            `;
         }
 
     </script>
